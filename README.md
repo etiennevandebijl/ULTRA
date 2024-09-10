@@ -1,2 +1,0 @@
-# ULTRA
-ULTRA project
