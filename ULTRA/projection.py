@@ -4,49 +4,8 @@ from itertools import product
 from models import MODEL_DICT
 
 from ULTRA.SSTCAplus import SSTCAplus
+from ULTRA.sampling import subset_data
 
-def subset(indices, weights, size):
-    '''We select `size' indices with the highest weights '''
-    
-    if isinstance(indices, list):
-        indices = np.array(indices)
-    
-    if isinstance(weights, list):
-        weights = np.array(weights)
-        
-    if size < 1 or size > len(weights):
-        raise ValueError("We cannot select more than the number of instances or 0 or less")
-    
-    if len(indices) != len(weights):
-        raise ValueError("Weight vector length should be equal to indicices")
-    
-    select = np.argsort(weights)[::-1][:size]
-    
-    return indices[select]
-
-def subset_data(L_s, L_d, U, p, subset_size):
-    
-    # Subset of all data as the projection matrix might be too large
-    
-    target_set = np.concatenate((L_d, U))
-
-    S_t = subset(L_s, p[L_s], subset_size)
-    T_t = subset(target_set, p[target_set], subset_size)
-    S_T_t = np.concatenate((S_t, T_t))
-
-    # This is not the best code, could be improved, but it works
-    L_s_subset = np.empty((0), dtype=int)
-    L_d_subset = np.empty((0), dtype=int)
-    U_subset = np.empty((0), dtype=int)
-    for i, s_t_t in enumerate(S_T_t):
-        if s_t_t in L_s:
-            L_s_subset = np.append(L_s_subset, i)
-        elif s_t_t in L_d:
-            L_d_subset = np.append(L_d_subset, i)
-        else:
-            U_subset = np.append(U_subset, i)
-        
-    return S_T_t, L_s_subset, L_d_subset, U_subset
 
 def determine_loss_and_epsilon(X, y, L, L_s, L_d, A, w, p, model_name, rs_clf):
     
@@ -58,7 +17,7 @@ def determine_loss_and_epsilon(X, y, L, L_s, L_d, A, w, p, model_name, rs_clf):
         clf.set_params(random_state=rs_clf)
     
     # Fit the model
-    clf.fit(X[L_s] @ A, y[L_s], sample_weight = p[L_s])
+    clf.fit(X[L] @ A, y[L], sample_weight = p[L])
 
     # Predict labelled instances (note that proba might not be optional, so we need to improve this)
     y_pred = clf.predict_proba(X[L] @ A)[:,1]

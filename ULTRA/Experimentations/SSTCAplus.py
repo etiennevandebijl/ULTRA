@@ -1,16 +1,16 @@
 import numpy as np
-from itertools import product
 import pandas as pd
+from itertools import product
 import matplotlib.pyplot as plt
 
-from ML.dataloader import dataloader
-from ML.models import MODEL_DICT
-from ML.evaluation import binary_evaluation_measures, BINARY_MEASURE_NAMES
-from ML.utils import select_balanced_subset
+from dataloader import dataloader
+from models import MODEL_DICT
+from evaluation import binary_evaluation_measures, BINARY_MEASURE_NAMES
+from utils import select_balanced_subset
 
-from ML.TL.ULTRA.projection import subset_data, determine_loss_and_epsilon
-from ML.TL.ULTRA.utils import normalize_weights
-from ML.TL.ULTRA.SSTCAplus import SSTCAplus
+from ULTRA.projection import subset_data, determine_loss_and_epsilon
+from ULTRA.utils import normalize_weights
+from ULTRA.SSTCAplus import SSTCAplus
 
 #%% Load data
 
@@ -27,12 +27,12 @@ X_d, y_d_mc, _, _ = dataloader(target_exp, feature_extractor, version, protocol,
 
 X_source, y_source = select_balanced_subset(X_s, y_s_mc, sizes, 0, make_binary = True)
 
-#X_target, y_target = select_balanced_subset(X_d, y_d_mc, sizes, 1, make_binary = True)
+X_target, y_target = select_balanced_subset(X_d, y_d_mc, sizes, 1, make_binary = True)
 X_eval, y_eval = select_balanced_subset(X_d, y_d_mc, sizes, 2, make_binary= True)
 
-selection = np.random.choice(np.where(y_d_mc == "Benign")[0], size = sizes)
-X_target = X_d[selection, :]
-y_target = np.zeros(sizes)
+# selection = np.random.choice(np.where(y_d_mc == "Benign")[0], size = sizes)
+# X_target = X_d[selection, :]
+# y_target = np.zeros(sizes)
 
 # %%
 
@@ -82,7 +82,7 @@ results_list = []
 
 for rs in range(10):
     print(rs)
-    for c, k, sigma, lamda, gamma, mu in product([2, 4, 10], 
+    for c, k, sigma, lamda, gamma, mu in product([8], 
                                              [10, 50, 100], #k 
                                              ["MED"], # Sigma
                                              [10, 100, 1000], # Lambda (Study)

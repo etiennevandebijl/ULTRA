@@ -2,9 +2,9 @@ import numpy as np
 
 from itertools import product
 
-from ML.dataloader import dataloader
-from ML.utils import select_balanced_subset
-from ML.TL.ULTRA.ultra import ultra
+from dataloader import dataloader
+from sampling import select_balanced_subset
+from ULTRA.ultra import ultra
 
 
 # %%

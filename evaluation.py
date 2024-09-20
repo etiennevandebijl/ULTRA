@@ -2,14 +2,20 @@ import numpy as np
 
 from sklearn.metrics import confusion_matrix, recall_score, f1_score, \
                             precision_score, accuracy_score, matthews_corrcoef
+                            
 import DutchDraw as dutchdraw
 
 BINARY_MEASURE_NAMES = ["TP", "TN", "FP", "FN", "Recall", "Precision", 
                         "Accuracy", "F_1", "MCC"]
 
-def binary_evaluation_measures(y_true, y_pred):
+def binary_evaluation_measures(y_true, y_pred, labels = [0,1]):
     '''
     We assume here that `1' represents a malicious session, while `0' is benign.
+    
+    Example:
+    y_true = np.random.choice([0,1], size = 100)
+    y_pred = np.random.choice([0,1], size = 100)
+    binary_evaluation_measures(y_true, y_pred)
     '''
     if isinstance(y_true, np.ndarray):
         y_true = y_true.tolist()
@@ -25,14 +31,14 @@ def binary_evaluation_measures(y_true, y_pred):
 
     if np.unique(np.array(y_pred)) not in np.array([0, 1]):
         raise ValueError("y_pred should only contain zeros and ones.")
-    
+        
     # Compute base measures
-    tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels = [0, 1]).ravel()
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels = labels).ravel()
     
     # Compute performance metrics
-    recall = recall_score(y_true, y_pred, zero_division = 0)
-    precision = precision_score(y_true, y_pred, zero_division = 0)
-    f1 = f1_score(y_true, y_pred, zero_division = 0)
+    recall = recall_score(y_true, y_pred, zero_division = 0, labels = labels)
+    precision = precision_score(y_true, y_pred, zero_division = 0, labels = labels)
+    f1 = f1_score(y_true, y_pred, zero_division = 0, labels = labels)
     accuracy = accuracy_score(y_true, y_pred)
     mcc = matthews_corrcoef(y_true, y_pred)
     

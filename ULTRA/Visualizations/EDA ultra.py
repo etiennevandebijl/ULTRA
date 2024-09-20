@@ -1,8 +1,6 @@
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt 
 
-from project_paths import PROJECT_PATH, get_results_df
+from project_paths import get_results_df
 
 # %% Experiment 1 V1 Visualizations
 
@@ -10,10 +8,10 @@ from project_paths import PROJECT_PATH, get_results_df
 df = get_results_df("ULTRA-experiment-3")
 
 df = df[['Source Experiment', 'Target Experiment',
-        'Model', 'Random state clf',
-        'Strategy', 'Size L_s', 'Size L_d', 'Size U', 'Iteration', 'Train Set',
-       'Weighting', 'Projection', 'Test Data', 'TP', 'TN', 'FP', 'FN',
-       'Accuracy', 'F_1', 'MCC']]
+         'Model', 'Random state clf',
+         'Strategy', 'Size L_s', 'Size L_d', 'Size U', 'Iteration', 'Train Set',
+         'Weighting', 'Projection', 'Test Data', 'TP', 'TN', 'FP', 'FN',
+         'Accuracy', 'F_1', 'MCC']]
 
 df = df[df["Train Set"] == "L"]
 df = df[df["Test Data"] == "Eval"]

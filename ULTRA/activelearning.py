@@ -1,7 +1,8 @@
 import numpy as np
+
 from models import MODEL_DICT
 
-def activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q):
+def activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q, use_weight = True):
 
     if strategy == "Random":
         np.random.seed(0)
@@ -15,13 +16,21 @@ def activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q):
             clf.set_params(random_state=rs_clf)
                 
         # Fit learner
-        clf.fit(X[L] @ A, y[L], sample_weight = p[L])
+        if use_weight:
+            clf.fit(X[L] @ A, y[L], sample_weight = p[L])
+        else:
+            clf.fit(X[L] @ A, y[L])
  
-        y_pred = clf.predict_proba(X[U] @ A)[:,1]
+        if hasattr(clf, 'decision_function'):
+            y_pred = clf.decision_function(X[U] @ A)
 
-        # Confidence
-        z_score = 2 * np.abs(y_pred - 0.5)
-        
+            z_score = np.abs(y_pred)
+        else:
+            y_pred = clf.predict_proba(X[U] @ A)[:,1]
+    
+            # Confidence
+            z_score = 2 * np.abs(y_pred - 0.5)
+            
         confidence = U[np.argsort(z_score)]
 
         # Sort on certainty or uncertainty
@@ -31,3 +40,5 @@ def activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q):
         selected = np.array(confidence[:q])
 
     return selected
+
+

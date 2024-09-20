@@ -43,26 +43,26 @@ def read_csv(path):
 
 # %% Data Loader
 
-def dataloader(experiment, feature_extracter, version, protocol, binary: bool = False, 
+def dataloader(experiment, feature_extractor, version, protocol, binary: bool = False, 
                remove_single_instance: bool = False):
     '''
 
-    
+    Example:
     X, y, _, _ = dataloader("UNSW-NB15", "NetFlow V1", "1_Raw", "NF")
     '''
     if experiment not in EXPERIMENTS:
         raise ValueError("Experiment is not correct")
         
-    if feature_extracter not in FEATURE_EXTRACTORS:
+    if feature_extractor not in FEATURE_EXTRACTORS:
         raise ValueError("Feature extractor is not correct")
     
     if protocol not in PROTOCOLS:
         raise ValueError("Protocol is not correct")
 
-    if not check_existence_dataset(experiment, feature_extracter, version, protocol):
+    if not check_existence_dataset(experiment, feature_extractor, version, protocol):
         raise ValueError("The combination of experiment, feature extractor, version and protocol does not exist")
 
-    data_path = get_data_folder(experiment, feature_extracter, version)
+    data_path = get_data_folder(experiment, feature_extractor, version)
     data = read_csv(data_path + protocol + ".csv")
 
     # Remove classes with only 1 instance in the data    
@@ -76,7 +76,7 @@ def dataloader(experiment, feature_extracter, version, protocol, binary: bool = 
 
 
 
-#%% Determine the experiments for which the models exists
+#%% Determine the experiments for which the data exists
 
 def retrieve_list_experiments(feature_extracter, version, protocol):
     exp_list = []

@@ -1,8 +1,8 @@
 import numpy as np
 
-from sklearn.metrics.pairwise import euclidean_distances, pairwise_kernels
-from sklearn.neighbors import kneighbors_graph
 from sklearn.utils import check_array
+from sklearn.neighbors import kneighbors_graph
+from sklearn.metrics.pairwise import euclidean_distances, pairwise_kernels
 
 from scipy import linalg
 
