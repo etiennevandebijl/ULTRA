@@ -80,18 +80,20 @@ def fit_predict(X, y, L, L_s, L_d, U, A, p, model_name, experiment_info, rs_clf,
 
         train_info["Weighting"] = True
 
-        clf.fit(X[ss], y[ss], sample_weight = p[ss])                
-        evaluate_model(clf, X, y, L, L_s, L_d, U, np.eye(X.shape[1]), experiment_info, train_info,
-                       X_target_eval, y_target_eval, store)
+        if 'sample_weight' in clf.get_params():
+            clf.fit(X[ss], y[ss], sample_weight = p[ss])                
+            evaluate_model(clf, X, y, L, L_s, L_d, U, np.eye(X.shape[1]), experiment_info, train_info,
+                           X_target_eval, y_target_eval, store)
 
         if update_A:
             
             train_info["Projection"] = True
     
-            clf.fit(X[ss] @ A, y[ss], sample_weight = p[ss])                
-            evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
-                           X_target_eval, y_target_eval, store)
-    
+            if 'sample_weight' in clf.get_params():
+                clf.fit(X[ss] @ A, y[ss], sample_weight = p[ss])                
+                evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
+                               X_target_eval, y_target_eval, store)
+        
             train_info["Weighting"] = False
             
             clf.fit(X[ss] @ A, y[ss])

@@ -6,15 +6,8 @@ from sklearn.metrics.pairwise import euclidean_distances, pairwise_kernels
 
 from scipy import linalg
 
-def SSTCAplus(X, y, L_s, L_d, U,
-              components, 
-              k, 
-              sigma, 
-              lamda, 
-              kernel = "linear",
-              gamma: float = 0.5, 
-              mu: float = 1., 
-              random_state: int = 0):
+def SSTCAplus(X, y, L_s, L_d, U, components, k, sigma, lamda, kernel = "linear",
+              gamma: float = 0.5, mu: float = 1., random_state: int = 0):
     
     '''We assume that L_s, L_d, U indicate the instances from either source, 
     target and then labelled or unlabelled'''
@@ -34,7 +27,8 @@ def SSTCAplus(X, y, L_s, L_d, U,
         
     # Construct matrix K 
     K = pairwise_kernels(X, X, metric = kernel) # Other option
-
+    # If linear, it simple computes X @ X.T
+    
     # Construct matrix L
     e = np.ones((M_total, 1))
     e[L_s, 0] = 1 / M_source
@@ -52,7 +46,7 @@ def SSTCAplus(X, y, L_s, L_d, U,
     
     #Exclude non-labelled
     a = np.ones((M_total, 1))
-    a[U, 0] = 0
+    a[U, 0] = 0 #DIT SWS want we weten we niet
     #a[L_d, 0] = 0
     O = a * a.T
     

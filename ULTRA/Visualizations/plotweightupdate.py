@@ -19,9 +19,6 @@ def plot_weight_update(w_list, L_s, L_d):
         source_average.append(np.mean(w_t_source))
         target_average.append(np.mean(w_t_target))
         
-    print(source_average)
-    print(target_average)
-    
     fig, ax = plt.subplots()
     ax.boxplot([source_w_t_list[-1], target_w_t_list[-1]], positions=[0, 1])
     ax.set_xticks([0, 1])

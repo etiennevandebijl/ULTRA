@@ -39,7 +39,6 @@ for combination, group in df.groupby(['Source Experiment', 'Target Experiment',
        'Evaluation model', 'Size L_d', 'Size U', 'Train Set']):
     
     if group[group["strategy"] == "NONE"].shape[0] == 0:
-        print(combination)
         continue
     MCC = group[group["strategy"] == "NONE"]["MCC"].values[0]
     group_ =  group[group["strategy"] != "NONE"]

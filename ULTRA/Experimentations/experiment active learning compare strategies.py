@@ -43,7 +43,7 @@ for source_exp, target_exp in product(datasets, datasets):
             U = np.setdiff1d(target_set, L_d)
             L = np.concatenate((L_s, L_d))
                 
-            for rs_eval_clf in range(1):
+            for rs_eval_clf in range(3):
                 for eval_model in ["RF", "DT"]:
                     
                     experiment_info = {"Source Experiment": source_exp,
@@ -75,7 +75,7 @@ for source_exp, target_exp in product(datasets, datasets):
                     for strategy in ["Random", "Uncertainty", "Certainty"]:
                         for q in [1, 5, 50]:
                             for al_model in ["RF", "DT"]:
-                                for rs_al_clf in range(3):
+                                for rs_al_clf in range(5):
     
                                     step_info = {"strategy": strategy,
                                                  "q": q,
