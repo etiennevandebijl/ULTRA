@@ -9,12 +9,14 @@ from ULTRA.ultra import ultra
 import warnings
 warnings.filterwarnings('ignore')
 
+'''My thoughts are that use_weight_AL is turned on here as I later edited
+the AL algorithm to put weights on on or off. '''
 feature_extractor = "NetFlow V1"
 version = "1_Raw"; 
 protocol = "NF"; 
 sizes = 10000
 
-datasets = ["UNSW-NB15", "BoT-IoT","CIC-IDS-2018", "ToN-IoT"]
+datasets = ["UNSW-NB15", "BoT-IoT", "CIC-IDS-2018", "ToN-IoT"]
 
 for source_exp, target_exp in product(datasets, datasets):
     

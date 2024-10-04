@@ -115,3 +115,75 @@ def select_malicious_subset(X, y_mc, size, random_state, make_binary: bool = Tru
     if make_binary: 
         y_mc = np.where(y_mc == "Benign", 0, 1) 
     return X[selected], y_mc[selected]
+
+
+def select_subset_BM_ratio(X, y_mc, bm_ratio = 0.5, random_state = 0, make_binary: bool = True):
+    
+    '''A bm_ratio between 0 and 1 indicates the fraction of benign data within the 
+    total dataset, with the rest being malicious.
+    
+    
+    X = np.random.uniform(size = (1000, 2))
+    y_mc = np.random.choice(["Benign", "Malicious_1", "Malicious_2"], size = 1000)
+    random_state = 2; make_binary = True; bm_ratio = 0.11
+    X, y = select_subset_BM_ratio(X, y_mc, bm_ratio, random_state, make_binary)
+    print(np.sum(1-y) / len(y))
+    
+    '''
+    
+    benign_instances = np.flatnonzero(y_mc == "Benign")
+    malicious_instances = np.flatnonzero(y_mc != "Benign")
+
+    M_benign = len(benign_instances)
+    M_malicious = len(malicious_instances)
+    M_total = M_benign + M_malicious
+
+    mb_ratio = 1 - bm_ratio
+
+    if (M_benign / M_total) > bm_ratio:
+        # Hier gaan we snoeien in de Benign instance, want het zijn er teveel
+        # M_benign_new / (M_benign_new + M_malicious) = bm_ratio
+        M_benign_new = round(M_malicious * bm_ratio / mb_ratio)
+        
+        np.random.seed(random_state)
+        benign_instances = np.random.choice(benign_instances, 
+                                      size = M_benign_new,
+                                      replace = False)
+    else:
+        # Hier gaan we snoeien in de Malicious instances
+        # M_benign / (M_benign + M_malicious_new) = bm_ratio
+        M_malicious_new = round(M_benign * mb_ratio / bm_ratio)
+
+        malicious_instances,_ = train_test_split(malicious_instances,
+                                                 stratify = y_mc[malicious_instances],
+                                                 train_size = M_malicious_new,
+                                                 random_state=random_state)
+
+    selected = np.sort(np.concatenate((benign_instances, malicious_instances)))
+    
+    if make_binary:
+        y_mc = np.where(y_mc == "Benign", 0, 1) 
+        
+    return X[selected], y_mc[selected]
+
+def get_bm_ratio_subset(X, y_mc, size, bm_ratio, random_state, make_binary: bool = True):
+    
+    X, y_mc = select_subset_BM_ratio(X, y_mc, bm_ratio, random_state, False)
+    X, _, y_mc, _ = train_test_split(X, y_mc, stratify = y_mc,
+                                     train_size = size, random_state=random_state)
+
+    if make_binary:
+        y_mc = np.where(y_mc == "Benign", 0, 1) 
+    return X, y_mc
+
+
+
+
+
+
+
+
+
+
+
+

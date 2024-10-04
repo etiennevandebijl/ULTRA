@@ -26,13 +26,12 @@ for source_exp, target_exp in product(datasets, datasets):
     for subset_rs in range(3):
         
         X_source, y_source = get_balanced_subset(X_s, y_s_mc, sizes, subset_rs, make_binary = True)
-        X_target, y_target = get_balanced_subset(X_d, y_d_mc, sizes, subset_rs, make_binary= True)
         X_eval, y_eval = get_balanced_subset(X_d, y_d_mc, sizes, subset_rs+10, make_binary= True)
 
-        # np.random.seed(subset_rs)
-        # selection = np.random.choice(np.where(y_d_mc == "Benign")[0], size = sizes)
-        # X_target = X_d[selection, :]
-        # y_target = np.zeros(sizes)
+        np.random.seed(subset_rs)
+        selection = np.random.choice(np.where(y_d_mc == "Benign")[0], size = sizes)
+        X_target = X_d[selection, :]
+        y_target = np.zeros(sizes)
 
         M_source, M_target = len(X_source), len(X_target)
         M_total = M_source + M_target
@@ -53,7 +52,7 @@ for source_exp, target_exp in product(datasets, datasets):
             L = np.concatenate((L_s, L_d))
                 
             for rs_eval_clf in range(3):
-                for eval_model in ["NN_BF"]:
+                for eval_model in ["RF"]:
                     
                     experiment_info = {"Source Experiment": source_exp,
                                         "Target Experiment": target_exp,
@@ -62,7 +61,7 @@ for source_exp, target_exp in product(datasets, datasets):
                                         "Protocol": protocol,
                                         "Sizes subsets": sizes,
                                         "Random_states subsets":subset_rs,
-                                        "experiment-name": "test SSTCA balanced",
+                                        "experiment-name": "test SSTCA target benign",
                                         "Evaluation model": eval_model,
                                         "Random state eval clf": rs_eval_clf,
                                         "Size L_s": len(L_s),

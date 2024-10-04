@@ -1,4 +1,3 @@
-
 from dataloader import dataloader
 from sampling import get_balanced_subset
 from ULTRA.ultra import ultra
@@ -20,9 +19,7 @@ experiment_info = {"Source Experiment": source_exp,
                     "Feature Extractor": feature_extractor,
                     "Version": version,
                     "Protocol": protocol,
-                    "Size Source": sizes,
-                    "Size Target": sizes,
-                    "Size eval": sizes,
+                    "Data Sizes": sizes,
                     "Random_state Source subset": 0, 
                     "Random_state Target subset": 1,
                     "Random_state Eval": 2,

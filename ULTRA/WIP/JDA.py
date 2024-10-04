@@ -39,7 +39,6 @@ def matrix_update(y, source_set, target_set, label):
     
     print("Predicted label " + str(label) + " amount :" + str(len(D_target)))
 
-    
     e = np.zeros((len(y), 1))
 
     e[D_source, 0] = 1 / len(D_source)
@@ -52,7 +51,7 @@ def matrix_update(y, source_set, target_set, label):
 def JDA(X, y, L_s, L_d, U,
               components, 
               clf,
-              lamda: float = 1., 
+              lamda: float = 10., 
               random_state: int = 0):
     
     '''We assume that L_s, L_d, U indicate the instances from either source, 
@@ -90,7 +89,7 @@ def JDA(X, y, L_s, L_d, U,
     M_M = np.zeros((M_total, M_total))
     M_B = np.zeros((M_total, M_total))
 
-    for i in range(10):
+    for i in range(20):
 
         #Grappig genoeg is dit een dimensie vs dimensie van X
         
@@ -106,7 +105,7 @@ def JDA(X, y, L_s, L_d, U,
     
         sort_index = np.argsort(np.abs(eigenvalues))[::-1][:components]
         eigenvalues = eigenvalues[sort_index]
-        
+        print(eigenvalues)
         A = eigenvectors[:, sort_index]
     
         Z = X @ A
@@ -116,12 +115,17 @@ def JDA(X, y, L_s, L_d, U,
         y_temp = np.copy(y)        
         y_temp[U] = clf.predict(Z[U])
         
+
         print(binary_evaluation_measures(y[U], y_temp[U]))
         
         # Update matrix
         M_B = matrix_update(y_temp, L_s, target_set, 0)
         M_M = matrix_update(y_temp, L_s, target_set, 1)
-
+        
+        
+        print(np.log(np.sum(eigenvalues)))
+        
+        
     clf.fit(X[L], y[L])
     
     y_temp = np.copy(y)        
@@ -131,60 +135,7 @@ def JDA(X, y, L_s, L_d, U,
     
     return A
 
-# %%
-from ML.dataloader import dataloader
-from ML.TL.ULTRA.ultra import ultra
-from ML.models import MODEL_DICT
-from ML.utils import select_balanced_subset
-import matplotlib.pyplot as plt
 
-
-#%% Load data
-
-source_exp = "UNSW-NB15"; target_exp = "UNSW-NB15"; feature_extractor = "NetFlow V1"
-version = "1_Raw"; protocol = "NF"; model_name = "RF"
-
-X_source, y_source_mc, _, _ = dataloader(source_exp, feature_extractor, version, protocol, False, True) 
-X_target, y_target_mc, _, _ = dataloader(target_exp, feature_extractor, version, protocol, False, True)
-
-X_source_ss, y_source_ss = select_balanced_subset(X_source, y_source_mc, 500, 0)
-X_target_ss, y_target_ss = select_balanced_subset(X_target, y_target_mc, 500, 1)
-
-X = np.vstack((X_source_ss, X_target_ss))
-y = np.concatenate((y_source_ss, y_target_ss))
-
-L_s = np.arange(0, 500)
-L_d = np.arange(500, 750)
-U = np.arange(750, 1000)
-
-clf = MODEL_DICT["RF"]
-
-A = JDA(X, y, L_s, L_d, U, 8, clf)
-
-# %%
-
-
-Z_source = X_source @ A
-Z_target = X_target @ A
-
-dim_1 = 0
-dim_2 = 1
-
-
-
-plt.figure(figsize = (10,10))
-plt.scatter(Z_source[y_source_mc == "Benign",dim_1], Z_source[y_source_mc == "Benign",dim_2], color = "green", marker = "+")
-plt.scatter(Z_source[y_source_mc != "Benign",dim_1], Z_source[y_source_mc != "Benign",dim_2], color = "red", marker = "x")
-plt.scatter(Z_target[y_target_mc == "Benign",dim_1], Z_target[y_target_mc == "Benign",dim_2], color = "orange", marker = "+")
-plt.scatter(Z_target[y_target_mc != "Benign",dim_1], Z_target[y_target_mc != "Benign",dim_2], color = "blue", marker = "x")
-
-#plt.xlim(-500000, 900000)
-#plt.ylim(-250, 250)
-
-plt.show()
-
-
-    
     
     
     
