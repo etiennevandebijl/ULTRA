@@ -24,7 +24,7 @@ for source_exp, target_exp in product(datasets, datasets):
     X_s, y_s_mc, _, _ = dataloader(source_exp, feature_extractor, version, protocol, False, True)    
     X_d, y_d_mc, _, _ = dataloader(target_exp, feature_extractor, version, protocol, False, True)    
     
-    for subset_rs in range(2):
+    for subset_rs in range(3):
         
         X_source, y_source = get_balanced_subset(X_s, y_s_mc, sizes, subset_rs, make_binary = True)
         X_eval, y_eval = get_balanced_subset(X_d, y_d_mc, sizes, subset_rs+10, make_binary= True)
@@ -43,7 +43,7 @@ for source_exp, target_exp in product(datasets, datasets):
         source_set = np.arange(0, M_source, dtype=np.int64)
         target_set = np.arange(M_source, M_total, dtype=np.int64)
     
-        for labelled_size in [20, 50, 100, 200]:
+        for labelled_size in [50, 100, 150, 200]:
         
             L_s = source_set
             L_d = np.random.choice(target_set, labelled_size, replace = False)
@@ -51,7 +51,7 @@ for source_exp, target_exp in product(datasets, datasets):
             L = np.concatenate((L_s, L_d))
                 
             for rs_eval_clf in range(3):
-                for eval_model in ["RF"]:
+                for eval_model in ["RF", "DT"]:
                     
                     experiment_info = {"Source Experiment": source_exp,
                                         "Target Experiment": target_exp,
@@ -60,7 +60,7 @@ for source_exp, target_exp in product(datasets, datasets):
                                         "Protocol": protocol,
                                         "Sizes subsets": sizes,
                                         "Random_states subsets":subset_rs,
-                                        "experiment-name": "test SSTCA-V2 target BM ratio 95",
+                                        "experiment-name": "test SSTCA-V2 target BM ratio 95 V2",
                                         "Evaluation model": eval_model,
                                         "Random state eval clf": rs_eval_clf,
                                         "Size L_s": len(L_s),
@@ -84,9 +84,9 @@ for source_exp, target_exp in product(datasets, datasets):
                                     X_target_eval = X_eval, y_target_eval = y_eval, 
                                     update_A = False, store = True)
 
-                    for k, sigma, lamda, gamma, mu in product([10, 50, 100, 200], #k 
+                    for k, sigma, lamda, gamma, mu in product([50, 100, 200], #k 
                                                              ["MED", "MEAN", 1.0], # Sigma
-                                                             [0, 1, 10, 100, 1000], # Lambda (Study)
+                                                             [0.01, 0.1, 1, 10, 100, 1000], # Lambda (Study)
                                                              [0.5], # Gamma (study) #BALANCING
                                                              [1] #mu (default original) 
                                                              ):
@@ -98,7 +98,7 @@ for source_exp, target_exp in product(datasets, datasets):
                                             lamda, "linear", gamma, mu)
 
                         
-                        for c in [4, 8, 10]:
+                        for c in [8]:
                             
                         
                             B = X.T @ W[:,0:c]
@@ -111,7 +111,7 @@ for source_exp, target_exp in product(datasets, datasets):
                                         "Gamma": gamma,
                                         "Mu": mu,
                                         "Top eigenvalue": eigenvalues[0],
-                                        "Sum eigenvalues": np.sum(eigenvalues[:c])
+                                        "Sum eigenvalues": np.sum(np.abs(eigenvalues[:c]))
                                         }                                
             
                             comb_info = {**experiment_info, **TL_info }

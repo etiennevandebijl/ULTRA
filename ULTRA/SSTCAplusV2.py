@@ -68,7 +68,7 @@ def locality_preserving(X, k, sigma):
     #https://ieeexplore-ieee-org.vu-nl.idm.oclc.org/stamp/stamp.jsp?tp=&arnumber=5570959
     if sigma == "MEAN":
         sigma = np.mean(dist_matrix)
-
+        
     # Affinity/adjecency  matrix (RBF ?)
     M = np.exp(- dist_matrix**2 / (2 * sigma**2)) * knn_graph
     

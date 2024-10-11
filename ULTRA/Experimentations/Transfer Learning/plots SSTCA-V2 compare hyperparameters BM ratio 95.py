@@ -26,6 +26,7 @@ df = df.groupby(['Source Experiment', 'Target Experiment', 'Evaluation model',
                   'Train Set', 'Projection'])[["TP", "TN", "FP", "FN", "MCC"]].mean().reset_index()
 
 
+
 df = df[df["Train Set"] != "L_s"]
 
 #df = df[df["Target Experiment"] == "CIC-IDS-2018"]
@@ -34,6 +35,8 @@ df_MCC = pd.pivot_table(df, index = [ 'Size L_d', 'Train Set', 'Number of compon
 
 
 
+df = df[df["Lambda"] != 0.0]
+df = df[df["Sigma"] == "MEAN"]
 
 for combination, group in df.groupby(['Source Experiment', 'Target Experiment', 'Size L_d']):
     
