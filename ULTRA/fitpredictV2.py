@@ -1,0 +1,126 @@
+import os
+import numpy as np
+import pandas as pd
+
+from project_paths import PROJECT_PATH
+from evaluation import binary_evaluation_measures, BINARY_MEASURE_NAMES
+from models import MODEL_DICT
+
+
+from sklearn.metrics import roc_auc_score
+
+
+def store_results(experiment_dict):
+    '''Store results'''
+
+    storage_path = PROJECT_PATH + "Results/Tables/" + \
+        experiment_dict["experiment-name"] + ".csv"
+    df = pd.DataFrame.from_dict(experiment_dict, orient = "index").T    
+    df.to_csv(storage_path, index=False, mode='a',
+              header=not os.path.isfile(storage_path))
+
+def evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
+                   X_target_eval = None, y_target_eval = None, store = False):
+    
+    y_pred = clf.predict(X @ A)
+    
+    if hasattr(clf, 'predict_proba'):
+        y_pred_proba = clf.predict_proba(X @ A)[:,1]    
+    
+    for test_set_name, ss in {"L": L, "L_s": L_s, "L_d": L_d, "U": U}.items():
+
+        eval_metrics = [np.nan] * len(BINARY_MEASURE_NAMES)
+        if len(ss) > 0:   
+            eval_metrics = binary_evaluation_measures(y[ss], y_pred[ss])
+        results = dict(zip(BINARY_MEASURE_NAMES, eval_metrics))
+
+        if hasattr(clf, 'predict_proba') and len(ss) > 0:
+            results["ROC-AUC"] = roc_auc_score(y[ss], y_pred_proba[ss])
+        else:
+            results["ROC-AUC"] = np.nan
+        
+        test_dict = {"Test Data": test_set_name}
+        experiment_dict = {**experiment_info, **train_info, **test_dict, **results}
+
+        if store:
+            store_results(experiment_dict)
+
+        
+    # We only determine the score on the evaluation dataset if we have their labels
+    if X_target_eval is not None and y_target_eval is not None:
+        
+        y_pred = clf.predict(X_target_eval @ A)
+
+        eval_metrics = binary_evaluation_measures(y_target_eval, y_pred)
+        results = dict(zip(BINARY_MEASURE_NAMES, eval_metrics))
+        
+        if hasattr(clf, 'predict_proba'):
+            results["ROC-AUC"] = roc_auc_score(y_target_eval, clf.predict_proba(X_target_eval @ A)[:,1])
+        else:
+            results["ROC-AUC"] = np.nan
+        
+        test_dict = {"Test Data": "Eval"}
+        experiment_dict = {**experiment_info, **train_info, **test_dict, **results}
+
+        if store:
+            store_results(experiment_dict)
+
+
+def fit_predict(X, y, L, L_s, L_d, U, A, p, model_name, experiment_info, rs_clf,
+                X_target_eval = None, y_target_eval = None, 
+                update_A = True, store = False):
+
+    # ML model
+    clf = MODEL_DICT[model_name]
+    
+    # Set random state if possible
+    if 'random_state' in clf.get_params():
+        clf.set_params(random_state=rs_clf)
+                
+    for train_set_name, ss in {"L": L, "L_s": L_s, "L_d": L_d}.items():
+        
+        if train_set_name == "L_d" and len(ss) == 0:
+            continue
+        
+        if not len(np.unique(y[ss])) > 1:
+            continue
+        
+        train_info = {"Train Set": train_set_name, "Model": model_name,
+                      "Weighting": False,
+                      "Projection": False
+                      }
+        
+        clf.fit(X[ss], y[ss])
+        evaluate_model(clf, X, y, L, L_s, L_d, U, np.eye(X.shape[1]), experiment_info, train_info,
+                       X_target_eval, y_target_eval, store)
+
+        train_info["Weighting"] = True
+
+        if 'sample_weight' in clf.get_params():
+            clf.fit(X[ss], y[ss], sample_weight = p[ss])                
+            evaluate_model(clf, X, y, L, L_s, L_d, U, np.eye(X.shape[1]), experiment_info, train_info,
+                           X_target_eval, y_target_eval, store)
+
+        if update_A:
+            
+            train_info["Projection"] = True
+    
+            if 'sample_weight' in clf.get_params():
+                clf.fit(X[ss] @ A, y[ss], sample_weight = p[ss])                
+                evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
+                               X_target_eval, y_target_eval, store)
+        
+            train_info["Weighting"] = False
+            
+            clf.fit(X[ss] @ A, y[ss])
+            evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
+                           X_target_eval, y_target_eval, store)
+
+
+
+
+
+
+
+
+
