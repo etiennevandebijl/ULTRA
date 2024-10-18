@@ -81,7 +81,7 @@ def fit_predict_simpler(X, y, L_s, L_d, U, dict_info, X_eval, y_eval):
     A = np.eye(X.shape[1])
     p = np.ones(M_total)
     
-    for rs_eval_clf, eval_model in product([0], ["RF"]) :
+    for rs_eval_clf, eval_model in product([0], ["NN_BF"]) :
          
         ml_info = {"Evaluation model": eval_model,
                    "Random state eval clf": rs_eval_clf}
@@ -141,7 +141,7 @@ for source_exp, target_exp in product(datasets, datasets):
                         "Size L_s": len(L_s),
                         "Size L_d": len(L_d),
                         "Size U": len(U),
-                        "experiment-name": "test SSTCA-V3 target BM ratio 95 V3"
+                        "experiment-name": "test SSTCA-V3 target BM ratio 95 V3 NN_BF"
                         }
             
             TCA_info = {"TCA version":None,

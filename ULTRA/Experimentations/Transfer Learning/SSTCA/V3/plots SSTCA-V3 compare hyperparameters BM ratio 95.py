@@ -8,7 +8,7 @@ from project_paths import get_results_df
 
 # %% Load data
 
-df = get_results_df("test SSTCA-V3 target BM ratio 95 V3")
+df = get_results_df("test SSTCA-V3 target BM ratio 95 V3 NN_BF")
 print(df.shape) # (3665340, 42)
 
 # Only look at evaluation data
@@ -20,7 +20,7 @@ df = df[df["Train Set"] != "L_s"]
 # (469152, 42)
 
 # Select RF
-df = df[df["Model"] == "RF"]
+df = df[df["Model"] == "NN_BF"]
 # (234576, 42)
 
 # Exclude redudant variables
@@ -40,7 +40,7 @@ for source_target, df_s_t in df.groupby(["Source Experiment", "Target Experiment
 
     df_TCA = df_s_t[df_s_t["TCA version"] == "TCA"]
     
-    df_TCA = pd.pivot_table(df_TCA, index = ["Kernel","Train Set"], columns = [ "Size L_d"], values = "MCC" )
+    df_TCA = pd.pivot_table(df_TCA, index = ["Kernel","Train Set"], columns = ["Size L_d"], values = "MCC" )
     results_dict_TCA[source_target] = df_TCA
 
     df_SSTCA = df_s_t[df_s_t["TCA version"] != "TCA"]
