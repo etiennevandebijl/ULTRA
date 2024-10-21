@@ -27,4 +27,3 @@ df = df[df["Model"] == "NN_BF"]
 df_summary = pd.pivot_table(df, columns = ["Train Set","Source Experiment",
                               "Target Experiment","Size L_d"], index = ["Kernel", "TCA version", "Model","Mu"], values = 'Accuracy', aggfunc = "mean") 
 
-df["Random_states subsets"].unique()

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from project_paths import get_results_df
 
 #%% 
-df = get_results_df("test SSTCA balanced")
+df = get_results_df(".test SSTCA balanced")
 df = df[df["Test Data"] == "Eval"]
 df = df[df["Weighting"] == False]
 
@@ -30,8 +30,9 @@ df = df.fillna("NONE")
 
 # Take mean over the random seeds
 df = df.groupby(['Source Experiment', 'Target Experiment', 'Evaluation model',
-                  'Size L_d', 'Size U', 'Number of components', 'Neighbours', 'Sigma', 'Lambda', 'Gamma','Mu',
-                  'Train Set', 'Projection'])[["TP", "TN", "FP", "FN", "MCC"]].mean().reset_index()
+                  'Size L_d', 'Size U', 'Number of components', 'Neighbours', 'Sigma', 
+                  'Lambda', 'Gamma', 'Mu', 'Train Set', 
+                  'Projection'])[["TP", "TN", "FP", "FN", "MCC"]].mean().reset_index()
 
 # Remove
 #df = df[(df["Sigma"] == "NONE") | (df["Projection"] == True)]

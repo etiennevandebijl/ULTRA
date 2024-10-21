@@ -29,7 +29,7 @@ def coefficient_matrix_L(M_source, M_target, L_s):
     L = e * e.T
     return L
 
-def label_dependence_K_yy_star(y, U, L_d, gamma, target_dependence = False, self_dependence = True):
+def label_dependence_K_yy_star(y, U, L_d, gamma = 0.5, target_dependence = False, self_dependence = True):
     M_total = len(y)
     
     Kyy = (y.reshape(-1, 1) == y).astype(int)    
@@ -52,7 +52,7 @@ def label_dependence_K_yy_star(y, U, L_d, gamma, target_dependence = False, self
     Kyy_star = gamma * Kyy + (1 - gamma) * np.eye(M_total)
     return Kyy_star
     
-def locality_preserving(X, k, sigma):
+def locality_preserving(X, k: int = 100, sigma = 1.0):
     M_total = X.shape[0]
         
     # locality preservation
@@ -83,7 +83,7 @@ def locality_preserving(X, k, sigma):
     return Laplace
     
 
-def SSTCAplusV3(X, y, L_s, L_d, U, components = 5, k = 5, sigma = "MED", lamda = 1, kernel = "linear",
+def SSTCAplusV3(X, y, L_s, L_d, U, components: int = 8, k: int = 100, sigma = 1.0, lamda = 1, kernel = "linear",
               gamma: float = 0.5, mu: float = 1., random_state: int = 0,
               semi_supervised = True, target_dependence = False, self_dependence = True):
     
@@ -159,7 +159,7 @@ def SSTCAplusV3(X, y, L_s, L_d, U, components = 5, k = 5, sigma = "MED", lamda =
     if semi_supervised:
         obj_3 = lamda * np.trace(W.T @ K @ Laplace @ K @ W)
     obj = obj_1 + obj_2 + obj_3
-    print(obj)
+    # print(obj)
     
     # Compute the projected data ( I am not sure about this one)
     # Z = K @ W

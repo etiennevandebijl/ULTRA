@@ -1,40 +1,27 @@
-import numpy as np
 import pandas as pd
-
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 from project_paths import get_results_df
 
 # %% Load data
 
-df = get_results_df("test SSTCA-V3 target BM ratio 95 V3 NN_BF")
-print(df.shape) # (3665340, 42)
+df = get_results_df("test SSTCA-V3 target BM ratio 95 V4")
+print(df.shape) 
 
 # Only look at evaluation data
 df = df[df["Test Data"] == "Eval"]
-# (733068, 42)
 
-# Not interested in L_S
 df = df[df["Train Set"] != "L_s"]
-# (469152, 42)
-
-# Select RF
-df = df[df["Model"] == "NN_BF"]
-# (234576, 42)
 
 # Exclude redudant variables
 df = df.drop(['Feature Extractor', 'Version', 'Protocol', 'Sizes subsets', 
-              'experiment-name', 'Test Data', "Weighting", "Model"], axis = 1)
-# (234576, 34)
-
+              'experiment-name', 'Test Data', "Weighting"], axis = 1)
 #df = df[df["Size L_d"] == 0]
 
 results_dict = {}
 results_dict_TCA = {}
 for source_target, df_s_t in df.groupby(["Source Experiment", "Target Experiment"]):
     
-    base_case = df_s_t[df_s_t["TCA version"].isnull()]
+    base_case = df_s_t[df_s_t["TCA Version"].isnull()]
     
     base_case = pd.pivot_table(base_case, columns = ["Size L_d"], index = ["Train Set"], values = "MCC" )
 
