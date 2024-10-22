@@ -11,6 +11,7 @@ warnings.filterwarnings('ignore')
 
 '''My thoughts are that use_weight_AL is turned on here as I later edited
 the AL algorithm to put weights on on or off. '''
+
 feature_extractor = "NetFlow V1"
 version = "1_Raw"; 
 protocol = "NF"; 
@@ -18,10 +19,10 @@ sizes = 10000
 
 datasets = ["UNSW-NB15", "BoT-IoT", "CIC-IDS-2018", "ToN-IoT"]
 
-for source_exp, target_exp in product(datasets, datasets):
+for source_dataset, target_dataset in product(datasets, datasets):
     
-    X_s, y_s_mc, _, _ = dataloader(source_exp, feature_extractor, version, protocol, False, True)    
-    X_d, y_d_mc, _, _ = dataloader(target_exp, feature_extractor, version, protocol, False, True)    
+    X_s, y_s_mc, _, _ = dataloader(source_dataset, feature_extractor, version, protocol, False, True)    
+    X_d, y_d_mc, _, _ = dataloader(target_dataset, feature_extractor, version, protocol, False, True)    
 
     for subset_rs in range(3):
         X_source, y_source = get_balanced_subset(X_s, y_s_mc, sizes, subset_rs, make_binary = True)
@@ -32,14 +33,14 @@ for source_exp, target_exp in product(datasets, datasets):
         X_target = X_d[selection, :]
         y_target = np.zeros(sizes)
 
-        experiment_info = {"Source Experiment": source_exp,
-                            "Target Experiment": target_exp,
-                            "Feature Extractor": feature_extractor,
-                            "Version": version,
-                            "Protocol": protocol,
-                            "Sizes subsets": sizes,
-                            "Random_states subsets":subset_rs,
-                            "experiment-name": "active learning target benign V1"}
+        experiment_info = {"source_dataset": source_dataset,
+                            "target_dataset": target_dataset,
+                            "feature_extractor": feature_extractor,
+                            "version": version,
+                            "protocol": protocol,
+                            "uniform_sample_size": sizes,
+                            "random_state_subset":subset_rs,
+                            "experiment_name": "active learning target benign V1"}
         print(experiment_info)
         
         for strategy in ["Random", "Certainty", "Uncertainty"]:

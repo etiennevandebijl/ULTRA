@@ -30,15 +30,15 @@ def ultra(X_source, y_source, X_target,
     if X_source.shape[1] != X_target.shape[1]:
         raise ValueError("Source and Target should have the same dimensionality")
     
-    input_settings = {"Model": model_name,
-                      "Random state clf": rs_clf,
-                      "Query size": q,
-                      "Max iter": T,
-                      "Subset size": subset_size,
-                      "Strategy": strategy,
-                      "Use weights AL": use_weights_AL,
-                      "Update A": update_A,
-                      "Update w": update_w
+    input_settings = {"model_ultra": model_name,
+                      "random_state_eval": rs_clf,
+                      "query_size": q,
+                      "num_iterations": T,
+                      "uniform_tl_sample_size": subset_size,
+                      "al_strategy": strategy,
+                      "train_al_with_weights": use_weights_AL,
+                      "update_projection": update_A,
+                      "update_weights": update_w
                       }
 
     experiment_settings = {**experiment_info, **input_settings}
@@ -81,10 +81,10 @@ def ultra(X_source, y_source, X_target,
         p = normalize_weights(w, U)
         
         # Gather statistics
-        counters = {"Size L_s": len(L_s),
-                    "Size L_d": len(L_d),
-                    "Size U": len(U),
-                    "Iteration": t
+        counters = {"l_s_size": len(L_s),
+                    "l_d_size": len(L_d),
+                    "u_size": len(U),
+                    "current_iteration": t
                      }
         print(counters)
         combined_info = {**experiment_settings, **counters}

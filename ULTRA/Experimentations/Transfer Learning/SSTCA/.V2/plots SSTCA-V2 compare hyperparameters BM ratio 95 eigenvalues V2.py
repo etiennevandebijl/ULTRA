@@ -7,65 +7,61 @@ from project_paths import get_results_df
 
 # %% Load data
 
-df = get_results_df("test SSTCA-V2 target BM ratio 95 V2")
+df = get_results_df(".test SSTCA-V2 target BM ratio 95 V2")
 print(df.shape) # (753060, 35)
 
 # Only look at evaluation data
-df = df[df["Test Data"] == "Eval"]
+df = df[df["test_set"] == "Eval"]
 
 #No Weighting
-df = df[df["Weighting"] == False]
+df = df[df["train_eval_with_weights"] == False]
 
 # Not interested in L_S
-df = df[df["Train Set"] != "L_s"]
+df = df[df["training_set"] != "L_s"]
 
 # Exclude redudant variables
 
 # Select RF
-df = df[df["Model"] == "RF"]
+df = df[df["model_eval"] == "RF"]
 
-df = df.drop(['Feature Extractor', 'Version', 'Protocol', 'Sizes subsets', 
-              'experiment-name', 'Test Data', "Weighting", "Model"], axis = 1)
+df = df.drop(['feature_extractor', 'version', 'protocol', 'uniform_sample_size', 
+              'experiment_name', 'test_set', "train_eval_with_weights"], axis = 1)
 
 # Variables SSTCA: 'Number of components', 'Neighbours', 'Sigma', 'Lambda', 'Gamma', 'Mu'
 # Evaluation: Top eigenvalue, MCC
 
 # RF does automatic feature-selection, so lets keep the original data space
 # We can always look at reducing the dataspace, but results are not yet decisive.
-df = df[df["Number of components"] == 8]
+df = df[df["num_components"] == 8]
 df.shape
 
 
 #%% 
-cols = ['Size L_d', 'Number of components', 'Neighbours', 'Sigma', 'Lambda', 
-        'Gamma', 'Mu', 'Train Set', 'Projection']
+cols = ['l_d_size', 'num_components', 'num_neighbours', 'sigma', 'lambda', 
+        'gamma', 'mu', 'training_set', 'train_eval_with_projection']
 
-#df = df[df["Sigma"] =='1.0']
-#df = df[df["Lambda"] == 1.0]
-#df = df[df["Neighbours"] == 100]
-
-for source_target, df_st in df.groupby(["Source Experiment", "Target Experiment"]):
+for source_target, df_st in df.groupby(["source_dataset", "target_dataset"]):
     
     fig, axs = plt.subplots(1, 4, figsize = (25,8))
     i = 0
     
-    min_MCC = df_st.groupby(cols)[["MCC"]].mean().min()[0]
-    max_MCC = df_st.groupby(cols)[["MCC"]].mean().max()[0]
+    min_MCC = df_st.groupby(cols)[["mcc"]].mean().min()[0]
+    max_MCC = df_st.groupby(cols)[["mcc"]].mean().max()[0]
     
-    for size, group in df_st.groupby(["Size L_d"]):
+    for size, group in df_st.groupby(["l_d_size"]):
 
-        group_B = group[(group["Projection"]==False)].groupby(["Train Set"])["MCC"].mean().to_dict()
+        group_B = group[(group["train_eval_with_projection"]==False)].groupby(["training_set"])["mcc"].mean().to_dict()
         
-        group_P = group[(group["Projection"]==True) & (group['Train Set'] == "L")]
+        group_P = group[(group["train_eval_with_projection"]==True) & (group['training_set'] == "L")]
         
-        group_P = group_P.groupby(cols)[["MCC", "Top eigenvalue", "Sum eigenvalues"]].mean().reset_index()
+        group_P = group_P.groupby(cols)[["mcc", "highest_abs_eigenvalue", "sum_abs_eigenvalues"]].mean().reset_index()
         
         
         colours = {"L": "black", "L_d": "red"}
         for TS, mcc in group_B.items():
             axs[i].axhline(mcc, label = "MCC RF trained on " + str(TS), color = colours[TS])
         
-        sns.scatterplot(x =np.log(np.abs(group_P["Top eigenvalue"])), y = group_P["MCC"], hue = group_P["Sigma"], palette='tab10',  ax=axs[ i])
+        sns.scatterplot(x =np.log(np.abs(group_P["highest_abs_eigenvalue"])), y = group_P["mcc"], hue = group_P["sigma"], palette='tab10',  ax=axs[ i])
 
         axs[i].set_title("Number of labelled target instances: " + str(size[0]) )
         axs[i].set_xlabel("Log transformed Eigenvalue Component 1")
@@ -80,21 +76,21 @@ for source_target, df_st in df.groupby(["Source Experiment", "Target Experiment"
 
 # %%
 
-for source_target, df_st in df.groupby(["Source Experiment", "Target Experiment"]):
+for source_target, df_st in df.groupby(["source_dataset", "target_dataset"]):
     
 
     fig, axs = plt.subplots(1, 4, figsize = (25,8))
     i = 0
     
 
-    for size, group in df_st.groupby(["Size L_d"]):
+    for size, group in df_st.groupby(["l_d_size"]):
 
-        group_B = group[(group["Projection"]==False)].groupby(["Train Set"])["MCC"].mean().to_dict()
+        group_B = group[(group["train_eval_with_projection"]==False)].groupby(["training_set"])["mcc"].mean().to_dict()
         
-        group_P = group[(group["Projection"]==True) & (group['Train Set'] == "L")]
+        group_P = group[(group["train_eval_with_projection"]==True) & (group['training_set'] == "L")]
 
 
-        sns.boxplot(x =group_P["Lambda"], y = group_P["MCC"], hue = group_P["Neighbours"], palette='tab10',  ax=axs[ i])
+        sns.boxplot(x =group_P["lambda"], y = group_P["mcc"], hue = group_P["num_neighbours"], palette='tab10',  ax=axs[ i])
         handles, labels = axs[i].get_legend_handles_labels()
         axs[i].get_legend().remove()
         axs[i].set_ylim(min_MCC,max_MCC)

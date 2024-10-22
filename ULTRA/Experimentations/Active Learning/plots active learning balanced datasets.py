@@ -8,23 +8,23 @@ path = "/home/etienne/Dropbox/Projects/ULTRA/Results/Figures/Experiment active l
 
 # Revrieve results
 df = get_results_df("active learning balanced datasets")
-df = df[df["Test Data"] == "Eval"]
-df = df[df["Weighting"] == False]
-df = df[df["Use weights AL"] == False]
+df = df[df["test_set"] == "Eval"]
+df = df[df["train_eval_with_weights"] == False]
+df = df[df["train_al_with_weights AL"] == False]
 
-df = df[['Source Experiment', 'Target Experiment', 
-       'Model', 'Random state clf', 'Size L_d',
-       'Strategy', 'Iteration', 'Train Set', "Weighting",
-       'Test Data', 'TP', 'TN', 'FP', 'FN',
-       'Recall', 'Precision', 'Accuracy', 'F_1', 'MCC']]
+df = df[['source_dataset', 'target_dataset', 
+       'model_ultra', 'random_state_eval', 'l_d_size',
+       'al_strategy', 'current_iteration', 'training_set', "train_eval_with_weights",
+       'test_set', 'tp', 'tn', 'fp', 'fn',
+       'recall', 'prec', 'acc', 'f1', 'mcc']]
 
-df = df.groupby(['Source Experiment', 'Target Experiment', "Model", "Train Set", 'Size L_d',
-        'Strategy', 'Iteration'])[["F_1", "MCC"]].mean().reset_index()
+df = df.groupby(['source_dataset', 'target_dataset','model_ultra',"training_set", 'l_d_size',
+        'al_strategy', 'current_iteration'])[["f1", "mcc"]].mean().reset_index()
 
 
  # %% 
     
-for combination, group in df.groupby(['Source Experiment', 'Target Experiment', "Model"]):
+for combination, group in df.groupby(['source_dataset', 'target_dataset','model_ultra']):
     
     if combination[2] == "SVM":
          continue
@@ -32,7 +32,7 @@ for combination, group in df.groupby(['Source Experiment', 'Target Experiment', 
     if combination[0] == combination[1]:
         continue
     
-    df_plot = pd.pivot_table(group, index = ["Size L_d"], columns = ["Strategy", "Train Set"], values = "MCC")
+    df_plot = pd.pivot_table(group, index = ["l_d_size"], columns = ["al_strategy", "training_set"], values = "mcc")
     
     plt.figure(figsize = (9,14))
     df_plot.plot(title = "Source " + str(combination[0]) + " - Target " + str(combination[1]) + " - Model " + str(combination[2]), figsize = (6,6))
@@ -46,15 +46,15 @@ for combination, group in df.groupby(['Source Experiment', 'Target Experiment', 
     
 #%% 
 
-for combination, group in df.groupby(['Source Experiment', 'Target Experiment']):
+for combination, group in df.groupby(['source_dataset', 'target_dataset']):
     
     if combination[0] == combination[1]:
         continue
     
-    group_ = group[group["Strategy"] == "Random"]
-    group_ = group_[group_["Train Set"] != "L_s"]
+    group_ = group[group["al_strategy"] == "Random"]
+    group_ = group_[group_["training_set"] != "L_s"]
     
-    df_plot = pd.pivot_table(group_, index = ["Size L_d"], columns = ["Model", "Train Set"], values = "MCC")
+    df_plot = pd.pivot_table(group_, index = ["l_d_size"], columns = ["model_ultra", "training_set"], values = "mcc")
 
     plt.figure(figsize = (9,9))
     df_plot.plot(title = "Source " + str(combination[0]) + " - Target " + str(combination[1]) + " - Strategy Random", figsize = (6,6))

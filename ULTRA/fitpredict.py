@@ -11,7 +11,7 @@ def store_results(experiment_dict):
     '''Store results'''
 
     storage_path = PROJECT_PATH + "Results/Tables/" + \
-        experiment_dict["experiment-name"] + ".csv"
+        experiment_dict["experiment_name"] + ".csv"
     df = pd.DataFrame.from_dict(experiment_dict, orient = "index").T    
     df.to_csv(storage_path, index=False, mode='a',
               header=not os.path.isfile(storage_path))
@@ -28,7 +28,7 @@ def evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
             eval_metrics = binary_evaluation_measures(y[ss], y_pred[ss])
         results = dict(zip(BINARY_MEASURE_NAMES, eval_metrics))
 
-        test_dict = {"Test Data": test_set_name}
+        test_dict = {"test_set": test_set_name}
         experiment_dict = {**experiment_info, **train_info, **test_dict, **results}
 
         if store:
@@ -43,7 +43,7 @@ def evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
         eval_metrics = binary_evaluation_measures(y_target_eval, y_pred)
         results = dict(zip(BINARY_MEASURE_NAMES, eval_metrics))
         
-        test_dict = {"Test Data": "Eval"}
+        test_dict = {"test_set": "Eval"}
         experiment_dict = {**experiment_info, **train_info, **test_dict, **results}
 
         if store:
@@ -69,16 +69,16 @@ def fit_predict(X, y, L, L_s, L_d, U, A, p, model_name, experiment_info, rs_clf,
         if not len(np.unique(y[ss])) > 1:
             continue
         
-        train_info = {"Train Set": train_set_name, "Model": model_name,
-                      "Weighting": False,
-                      "Projection": False
+        train_info = {"training_set": train_set_name, "model_eval": model_name,
+                      "train_eval_with_weights": False,
+                      "train_eval_with_projection": False
                       }
         
         clf.fit(X[ss], y[ss])
         evaluate_model(clf, X, y, L, L_s, L_d, U, np.eye(X.shape[1]), experiment_info, train_info,
                        X_target_eval, y_target_eval, store)
 
-        train_info["Weighting"] = True
+        train_info["train_eval_with_weights"] = True
 
         if 'sample_weight' in clf.get_params():
             clf.fit(X[ss], y[ss], sample_weight = p[ss])                
@@ -87,14 +87,14 @@ def fit_predict(X, y, L, L_s, L_d, U, A, p, model_name, experiment_info, rs_clf,
 
         if update_A:
             
-            train_info["Projection"] = True
+            train_info["train_eval_with_projection"] = True
     
             if 'sample_weight' in clf.get_params():
                 clf.fit(X[ss] @ A, y[ss], sample_weight = p[ss])                
                 evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,
                                X_target_eval, y_target_eval, store)
         
-            train_info["Weighting"] = False
+            train_info["train_eval_with_weights"] = False
             
             clf.fit(X[ss] @ A, y[ss])
             evaluate_model(clf, X, y, L, L_s, L_d, U, A, experiment_info, train_info,

@@ -5,45 +5,53 @@ import matplotlib.pyplot as plt
 
 from project_paths import get_results_df
 
-df = get_results_df("test SSTCA target BM ratio 95")
-df = df[df["Test Data"] == "Eval"]
-df = df[df["Weighting"] == False]
+df = get_results_df(".test SSTCA target BM ratio 95")
+df = df[df["test_set"] == "Eval"]
+df = df[df["train_eval_with_weights"] == False]
 
-df = df.drop(['Feature Extractor',
-              'Version', 
-              'Protocol', 
-              'Sizes subsets', 
-              'experiment-name', 
-              'Test Data', 
-              "Weighting",
-              "Size L_s", 
-              "Model"], axis = 1)
+df = df.drop(['feature_extractor',
+              'version', 
+              'protocol', 
+              'uniform_sample_size', 
+              'experiment_name', 
+              'test_set', 
+              "train_eval_with_weights",
+              "l_s_size"], axis = 1)
+
+
+
 
 df = df.fillna("NONE")
 
-df = df.groupby(['Source Experiment', 'Target Experiment', 'Evaluation model',
-                  'Size L_d', 'Size U', 'Number of components', 'Neighbours', 'Sigma', 'Lambda', 'Gamma','Mu',
-                  'Train Set', 'Projection'])[["TP", "TN", "FP", "FN", "MCC"]].mean().reset_index()
-
-#df = df[(df["Sigma"] == "NONE") | (df["Projection"] == True)]
-
-df = df[df["Train Set"] != "L_s"]
-
-#df = df[df["Target Experiment"] == "CIC-IDS-2018"]
-
-df_MCC = pd.pivot_table(df, index = [ 'Size L_d', 'Train Set', 'Number of components', 'Neighbours', 'Sigma', 'Lambda'], columns = ['Gamma','Mu'], values = "MCC" )
+df = df.groupby(['source_dataset','target_dataset', 'model_eval',
+                  'l_d_size', 'u_size', 'num_components', 'num_neighbours', 'sigma', 
+                  'lambda', 'gamma', 'mu', 'training_set', 
+                  'train_eval_with_projection'])[["tp", "tn", "fp", "fn", "mcc"]].mean().reset_index()
 
 
 
+#df = df[(df["sigma"] == "NONE") | (df["train_eval_with_projection"] == True)]
 
-for combination, group in df.groupby(['Source Experiment', 'Target Experiment', 'Size L_d']):
+df = df[df["training_set"] != "L_s"]
+
+#df = df[df["target_dataset"] == "CIC-IDS-2018"]
+
+df_MCC = pd.pivot_table(df, index = [ 'l_d_size', 'training_set', 'num_components', 'num_neighbours', 'sigma', 'lambda'], 
+                        columns = ['gamma','mu'], values = "mcc" )
+
+
+
+
+for combination, group in df.groupby(['source_dataset','target_dataset', 'l_d_size']):
     
     if combination[2] != 50:
         continue
     plt.figure(figsize = (10,10))
-    sns.boxplot(data = group,  x = "Projection", y = "MCC", hue = "Train Set")
+    sns.boxplot(data = group,  x = "train_eval_with_projection", y = "mcc", hue = "training_set")
     plt.title(combination)
     plt.show()
     
 
-df_summary = pd.pivot_table(df[df["Size L_d"] == 20], index = ['Source Experiment', 'Target Experiment'], columns = ["Train Set", "Projection"], values="MCC", aggfunc = "max" ).fillna(0)
+df_summary = pd.pivot_table(df[df["l_d_size"] == 20], index = ['source_dataset','target_dataset'], 
+                            columns = ["training_set", "train_eval_with_projection"], 
+                            values="mcc", aggfunc = "max" ).fillna(0)

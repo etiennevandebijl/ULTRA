@@ -20,7 +20,7 @@ p = np.ones(X.shape[0])
 q = 5
 
 strategy = "Uncertainty"
-activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q, use_weight = True)
+activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q, weighted_training = True)
 
 
 

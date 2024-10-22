@@ -19,13 +19,12 @@ L = np.concatenate((L_s, L_d))
 A = np.eye(X.shape[1])
 p = np.ones(M) / M 
 
-experiment_info = {"Experiment": exp,
-                "Feature Extractor": feature_extractor,
-                "Version": version,
-                "Protocol": protocol,
-                "Model": model_name,
-                "experiment-name":"Example",
-                "Update A": update_A}
+experiment_info = {"experiment": exp,
+                "feature_extractor": feature_extractor,
+                "version": version,
+                "protocol": protocol,
+                "experiment_name":"Example",
+                "update_projection": update_A}
             
 fit_predict(X, y, L,  L_s, L_d, U, A, p, model_name, experiment_info, rs_clf,
                 X_target_eval = None, y_target_eval = None, update_A = update_A,

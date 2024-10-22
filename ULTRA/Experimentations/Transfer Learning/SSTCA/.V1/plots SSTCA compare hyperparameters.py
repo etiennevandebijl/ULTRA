@@ -6,20 +6,19 @@ from project_paths import get_results_df
 
 #%% 
 df = get_results_df(".test SSTCA balanced")
-df = df[df["Test Data"] == "Eval"]
-df = df[df["Weighting"] == False]
+df = df[df["test_set"] == "Eval"]
+df = df[df["train_eval_with_weights"] == False]
 
-df = df.drop(['Feature Extractor',
-              'Version', 
-              'Protocol', 
-              'Sizes subsets', 
-              'experiment-name', 
-              'Test Data', 
-              "Weighting",
-              "Size L_s", 
-              "Model"], axis = 1)
+df = df.drop(['feature_extractor',
+              'version', 
+              'protocol', 
+              'uniform_sample_size', 
+              'experiment_name', 
+              'test_set', 
+              "train_eval_with_weights",
+              "l_s_size"], axis = 1)
 
-# df.to_csv("/home/etienne/Dropbox/Projects/ULTRA/Results/Tables/test SSTCA balanced No Weighting Eval Test.csv", index = False )
+# df.to_csv("/home/etienne/Dropbox/Projects/ULTRA/Results/Tables/.test SSTCA balanced No Weighting Eval Test.csv", index = False )
 
 #%% 
 
@@ -28,39 +27,41 @@ df = get_results_df("test SSTCA balanced No Weighting Eval Test")
 # Fill in the base case
 df = df.fillna("NONE")
 
+
 # Take mean over the random seeds
-df = df.groupby(['Source Experiment', 'Target Experiment', 'Evaluation model',
-                  'Size L_d', 'Size U', 'Number of components', 'Neighbours', 'Sigma', 
-                  'Lambda', 'Gamma', 'Mu', 'Train Set', 
-                  'Projection'])[["TP", "TN", "FP", "FN", "MCC"]].mean().reset_index()
+df = df.groupby(['source_dataset','target_dataset', 'model_eval',
+                  'l_d_size', 'u_size', 'num_components', 'num_neighbours', 'sigma', 
+                  'lambda', 'gamma', 'mu', 'training_set', 
+                  'train_eval_with_projection'])[["tp", "tn", "fp", "fn", "mcc"]].mean().reset_index()
 
 # Remove
-#df = df[(df["Sigma"] == "NONE") | (df["Projection"] == True)]
+#df = df[(df["sigma"] == "NONE") | (df["train_eval_with_projection"] == True)]
 
-df = df[df["Train Set"] != "L_s"]
+df = df[df["training_set"] != "L_s"]
 
-# results_dict = {}
-# for combination, group in df.groupby(['Source Experiment', 'Target Experiment']):
+results_dict = {}
+for combination, group in df.groupby(['source_dataset','target_dataset']):
     
-#     df_MCC = pd.pivot_table(group, index = [ 'Size L_d', 'Train Set', 'Number of components', 'Neighbours', 'Sigma', 'Lambda'], columns = ['Gamma','Mu'], values = "MCC" )
-#     results_dict[combination] = df_MCC
+    df_MCC = pd.pivot_table(group, index = [ 'l_d_size', 'training_set', 'num_components', 'num_neighbours', 'sigma', 'lambda'], 
+                            columns = ['gamma','mu'], values = "mcc" )
+    results_dict[combination] = df_MCC
     
 
 
-df_summary = pd.pivot_table(df[df["Size L_d"] == 10], columns = ['Source Experiment', 'Target Experiment',  'Train Set'], index = ['Mu'], values = "MCC", aggfunc = 'mean')
+df_summary = pd.pivot_table(df[df["l_d_size"] == 10], 
+                            columns = ['source_dataset','target_dataset', 'training_set'], 
+                            index = ['mu'], values = "mcc", aggfunc = 'mean')
 
 
-df = df[df["Size L_d"] == 10]
+df = df[df["l_d_size"] == 10]
 
-# df = df[df['Number of components'].isin(["NONE", 4, 6, 8, 10])]
+# df = df[df['num_components'].isin(["NONE", 4, 6, 8, 10])]
 
-#df = df[df["Target Experiment"] == "CIC-IDS-2018"]
+#df = df[df["target_dataset"] == "CIC-IDS-2018"]
 #%%
 
-
-
-for combination, group in df.groupby(['Source Experiment', 'Target Experiment', ]):
+for combination, group in df.groupby(['source_dataset','target_dataset']):
     plt.figure(figsize = (10,10))
-    sns.boxplot(data = group,  x = "Projection", y = "MCC", hue = "Train Set")
+    sns.boxplot(data = group,  x = "train_eval_with_projection", y = "mcc", hue = "training_set")
     plt.title(combination)
     plt.show()

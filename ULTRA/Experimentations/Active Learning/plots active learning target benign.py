@@ -16,27 +16,27 @@ where q = 50 as well as q=900, where this will even be more extreme.
 
 # Revrieve results
 df = get_results_df("active learning target benign V2")
-df = df[df["Test Data"] == "Eval"]
-df = df[df["Weighting"] == False]
+df = df[df["test_set"] == "Eval"]
+df = df[df["train_eval_with_weights"] == False]
 
-df = df[['Source Experiment', 'Target Experiment', 
-       'Model', 'Random state clf',
-       'Strategy', 'Size L_d', 'Train Set', "Weighting",
-       'Test Data', 'TP', 'TN', 'FP', 'FN',
-       'Recall', 'Precision', 'Accuracy', 'F_1', 'MCC']]
+df = df[['source_dataset', 'target_dataset', 
+       'model_ultra', 'random_state_subset',
+       'al_strategy', 'l_d_size', 'training_set',
+       'tp', 'tn', 'fp', 'fn',
+       'recall', 'prec', 'acc', 'f1', 'mcc']]
 
-df = df.groupby(['Source Experiment', 'Target Experiment', "Model", "Train Set",
-        'Strategy', 'Size L_d'])[['TP', 'TN', 'FP', 'FN',"F_1", "MCC"]].mean().reset_index()
+df = df.groupby(['source_dataset', 'target_dataset', 'model_ultra', "training_set",
+        'al_strategy', 'l_d_size'])[['tp', 'tn', 'fp', 'fn',"f1", "mcc"]].mean().reset_index()
 
 
  # %% 
     
-for combination, group in df.groupby(['Source Experiment', 'Target Experiment', "Model"]):
+for combination, group in df.groupby(['source_dataset', 'target_dataset', 'model_ultra']):
     
     if combination[0] == combination[1]:
         continue
     
-    df_plot = pd.pivot_table(group, index = ["Size L_d"], columns = ["Strategy", "Train Set"], values = "MCC")
+    df_plot = pd.pivot_table(group, index = ["l_d_size"], columns = ["al_strategy", "training_set"], values = "mcc")
     
     plt.figure(figsize = (9,9))
     df_plot.plot(title = str(combination))
@@ -45,12 +45,12 @@ for combination, group in df.groupby(['Source Experiment', 'Target Experiment', 
 
 #%% 
 
-for combination, group in df.groupby(['Source Experiment', 'Target Experiment', "Train Set"]):
+for combination, group in df.groupby(['source_dataset', 'target_dataset', "training_set"]):
 
     if combination[0] == combination[1]:
         continue
 
-    df_plot = pd.pivot_table(group[group["Strategy"] == "Random"], index = ["Size L_d"], columns = ["Model"], values = "MCC")
+    df_plot = pd.pivot_table(group[group["al_strategy"] == "Random"], index = ["l_d_size"], columns = ["model_ultra"], values = "mcc")
 
     plt.figure(figsize = (9,9))
     df_plot.plot(title = str(combination))
