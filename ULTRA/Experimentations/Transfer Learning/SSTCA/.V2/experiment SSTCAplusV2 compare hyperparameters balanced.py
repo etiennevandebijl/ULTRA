@@ -82,7 +82,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
 
                     fit_predict(X, y, L, L_s, L_d, U, A, p, eval_model, comb_info, rs_eval_clf,
                                     X_target_eval = X_eval, y_target_eval = y_eval, 
-                                    update_A = False, store = True)
+                                    update_projection = False, store = True)
 
                     for k, sigma, lamda, gamma, mu in product([10, 50, 100, 200], #k 
                                                              ["MED", "MEAN", 1.0], # Sigma
@@ -119,5 +119,5 @@ for source_dataset, target_dataset in product(datasets, datasets):
     
                             fit_predict(X, y, L, L_s, L_d, U, B, p, eval_model, comb_info, rs_eval_clf,
                                             X_target_eval = X_eval, y_target_eval = y_eval, 
-                                            update_A = True, store = True)
+                                            update_projection = True, store = True)
 

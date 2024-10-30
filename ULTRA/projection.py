@@ -7,14 +7,14 @@ from ULTRA.SSTCAplus import SSTCAplus
 from ULTRA.sampling import subset_data
 
 
-def determine_loss_and_epsilon(X, y, L, L_s, L_d, A, w, p, model_name, rs_clf):
+def determine_loss_and_epsilon(X, y, L, L_s, L_d, A, w, p, model_tl, random_state_tl):
     
     # ML model
-    clf = MODEL_DICT[model_name]
+    clf = MODEL_DICT[model_tl]
     
     # Set random state if possible
     if 'random_state' in clf.get_params():
-        clf.set_params(random_state=rs_clf)
+        clf.set_params(random_state=random_state_tl)
     
     # Fit the model
     clf.fit(X[L] @ A, y[L], sample_weight = p[L])
@@ -34,7 +34,7 @@ def determine_loss_and_epsilon(X, y, L, L_s, L_d, A, w, p, model_name, rs_clf):
     return eps_A, loss
 
     
-def optimize_projection_matrix(X, y, L, L_s, L_d, U, w, p, subset_size, model_name, rs_clf):
+def optimize_projection_matrix(X, y, L, L_s, L_d, U, w, p, subset_size, model_tl, random_state_tl):
     
     # Retrieve new sets based on labelled subset
     S_T_t, L_s_subset, L_d_subset, U_subset = subset_data(L_s, L_d, U, p, subset_size)
@@ -72,7 +72,7 @@ def optimize_projection_matrix(X, y, L, L_s, L_d, U, w, p, subset_size, model_na
         # As we selected Linear, we can simply circomvent the kernel
         B = X[S_T_t].T @ B
 
-        eps_B, loss = determine_loss_and_epsilon(X, y, L, L_s, L_d, B, w, p, model_name, rs_clf)
+        eps_B, loss = determine_loss_and_epsilon(X, y, L, L_s, L_d, B, w, p, model_tl, random_state_tl)
 
         print(eps_B)
 

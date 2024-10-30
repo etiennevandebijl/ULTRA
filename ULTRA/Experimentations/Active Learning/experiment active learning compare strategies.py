@@ -69,7 +69,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
 
                     fit_predict(X, y, L, L_s, L_d, U, A, p, eval_model, comb_info, rs_eval_clf,
                                     X_target_eval = X_eval, y_target_eval = y_eval, 
-                                    update_A = False, store = True)
+                                    update_projection = False, store = True)
 
                     for strategy in ["Random", "Uncertainty", "Certainty"]:
                         for q in [1, 5, 50]:
@@ -83,7 +83,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                     
                                     selected = activelearning(X, y, al_model, rs_al_clf, 
                                                               strategy, L, U, A, p, q, 
-                                                              use_weight = False)
+                                                              weighted_training = False)
                     
                                     L_d_ = np.concatenate((L_d, selected))
                                     L_ = np.concatenate((L, selected))
@@ -93,5 +93,5 @@ for source_dataset, target_dataset in product(datasets, datasets):
 
                                     fit_predict(X, y, L_, L_s, L_d_, U_, A, p, eval_model, comb_info, rs_eval_clf,
                                                     X_target_eval = X_eval, y_target_eval = y_eval, 
-                                                    update_A = False, store = True)
+                                                    update_projection = False, store = True)
 

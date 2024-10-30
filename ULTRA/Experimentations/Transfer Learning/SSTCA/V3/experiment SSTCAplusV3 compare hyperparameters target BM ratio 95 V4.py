@@ -89,7 +89,7 @@ def fit_predict_simpler(X, y, L_s, L_d, U, dict_info, X_eval, y_eval):
         
         fit_predict(X, y, L, L_s, L_d, U, A, p, eval_model, comb_info, rs_eval_clf,
                     X_target_eval = X_eval, y_target_eval = y_eval, 
-                    update_A = False, store = False)
+                    update_projection = False, store = True)
 
 
 for source_dataset, target_dataset in product(datasets, datasets):
@@ -100,7 +100,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
     X_s, y_s_mc, _, _ = dataloader(source_dataset, feature_extractor, version, protocol, False, True)    
     X_d, y_d_mc, _, _ = dataloader(target_dataset, feature_extractor, version, protocol, False, True)    
     
-    for subset_rs in range(3):
+    for subset_rs in range(4):
         
         X_source, y_source = get_balanced_subset(X_s, y_s_mc, size, subset_rs, make_binary = True)
         X_eval, y_eval = get_balanced_subset(X_d, y_d_mc, size, subset_rs+10, make_binary = True)

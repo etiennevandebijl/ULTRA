@@ -48,7 +48,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                               X_target_eval = X_eval, 
                               y_target_eval = y_eval, 
                               use_weights_AL = use_weights_AL,
-                              update_w = False,
-                              update_A = False,
+                              update_weights = False,
+                              update_projection = False,
                               experiment_info = experiment_info, 
                               store = True)

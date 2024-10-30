@@ -1,26 +1,31 @@
 import numpy as np
 
 from ULTRA.activelearning import activelearning
-from ULTRA.projection import optimize_projection_matrix, determine_loss_and_epsilon
+from ULTRA.projectionV2 import optimize_projection_matrix, determine_loss_and_epsilon
 
 from ULTRA.weightupdate import normalize_weights, weightupdate
-from ULTRA.fitpredict import fit_predict
+from ULTRA.fitpredictV2 import fit_predict
 from ULTRA.Visualizations.plotweightupdate import plot_weight_update
 
 
-def ultra(X_source, y_source, X_target, 
-          model_name,
-          rs_clf: int = 0, 
-          q: int = 10, # Query size                                            #AL
-          T: int = 50, # Number of iterations                                  #AL
-          subset_size: int = 500, # Should Source and Target have the same?    #TL
+def ultraV2(X_source, y_source, X_target, 
+          model_al,
+          model_eval,
+          model_tl,
+          random_state_al: int = 0,
+          random_state_eval: int = 0,
+          random_state_tl: int = 0,
+          q: int = 5, # Query size                                            #AL
+          T: int = 20, # Number of iterations                                  #AL
+          uniform_tl_sample_size: int = 100, # Should Source and Target have the same?    #TL
           strategy = "Random", # Active Learning stategy                       #AL
           y_target = None, # For experimentation purposes
           X_target_eval = None, # For experimentation purposes
           y_target_eval = None, # For experimentation purposes
           experiment_info = {},
           store = False,
-          use_weights_AL = True,
+          weighted_training_al = False,
+          weighted_training_tl = False,
           update_projection = True, # In case we don't want to perform TL               #TL
           update_weights = True, # In case we don't want to update weights            
           plot_weight = False
@@ -30,13 +35,17 @@ def ultra(X_source, y_source, X_target,
     if X_source.shape[1] != X_target.shape[1]:
         raise ValueError("Source and Target should have the same dimensionality")
     
-    input_settings = {"model_ultra": model_name,
-                      "random_state_eval": rs_clf,
+    input_settings = {"model_al": model_al,
+                      "model_tl": model_tl,
+                      "random_state_eval": random_state_eval,
+                      "random_state_al": random_state_al,
+                      "random_state_tl": random_state_tl,
                       "query_size": q,
                       "num_iterations": T,
-                      "uniform_tl_sample_size": subset_size,
+                      "uniform_tl_sample_size": uniform_tl_sample_size,
                       "al_strategy": strategy,
-                      "train_al_with_weights": use_weights_AL,
+                      "train_al_with_weights": weighted_training_al,
+                      "train_tl_with_weights": weighted_training_tl,
                       "update_projection": update_projection,
                       "update_weights": update_weights
                       }
@@ -90,12 +99,12 @@ def ultra(X_source, y_source, X_target,
         combined_info = {**experiment_settings, **counters}
         
         # We want to keep track of all information
-        fit_predict(X, y, L, L_s, L_d, U, A, p, model_name, combined_info, rs_clf,
+        fit_predict(X, y, L, L_s, L_d, U, A, p, model_eval, combined_info, random_state_eval,
                         X_target_eval, y_target_eval, update_projection, store)
         
         # Perform Active Learning
-        selected = activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q, use_weights_AL)
-        
+        selected = activelearning(X, y, model_al, random_state_al, strategy, L, U, A, p, q, weighted_training_al)
+
         # Update L_d_t, L_t, U_t
         L_d = np.concatenate((L_d, selected))
         L = np.concatenate((L, selected))
@@ -107,10 +116,12 @@ def ultra(X_source, y_source, X_target,
         # Perform Active Learning
         if update_projection:
             A, epsilon_opt, loss_opt = optimize_projection_matrix(X, y, L, L_s, 
-                                                              L_d, U, w, p, subset_size, model_name, rs_clf)
+                                                              L_d, U, w, p, uniform_tl_sample_size, 
+                                                              model_tl, random_state_tl, weighted_training_tl)
         else:
             if update_weights:
-                epsilon_opt, loss_opt = determine_loss_and_epsilon(X, y, L, L_s, L_d, A, w, p, model_name, rs_clf)
+                epsilon_opt, loss_opt = determine_loss_and_epsilon(X, y, L, L_s, L_d, A, w, p, model_tl, random_state_tl, 
+                                                                   weighted_training_tl)
 
         if update_weights:
             w = weightupdate(L_s, L_d, T, epsilon_opt, loss_opt, w)

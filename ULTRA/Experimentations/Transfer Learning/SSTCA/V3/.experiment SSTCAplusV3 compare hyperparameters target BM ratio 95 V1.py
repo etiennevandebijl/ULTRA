@@ -89,7 +89,7 @@ def fit_predict_simpler(X, y, L_s, L_d, U, dict_info, X_eval, y_eval):
         
         fit_predict(X, y, L, L_s, L_d, U, A, p, eval_model, comb_info, rs_eval_clf,
                     X_target_eval = X_eval, y_target_eval = y_eval, 
-                    update_A = False, store = True)
+                    update_projection = False, store = True)
 
 
 

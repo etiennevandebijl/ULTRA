@@ -2,7 +2,7 @@ import numpy as np
 
 from models import MODEL_DICT
 
-def activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q, weighted_training = True):
+def activelearning(X, y, model_al, random_state_al, strategy, L, U, A, p, q, weighted_training = True):
 
     if not strategy in ["Random", "Certainty", "Uncertainty"]:
         raise ValueError("Strategy is only computed for Random and (Un)certainty")
@@ -15,11 +15,11 @@ def activelearning(X, y, model_name, rs_clf, strategy, L, U, A, p, q, weighted_t
         selected = np.random.choice(U, size = q, replace = False)
     else:
 
-        clf = MODEL_DICT[model_name]
+        clf = MODEL_DICT[model_al]
 
         # Set random state if possible
         if 'random_state' in clf.get_params():
-            clf.set_params(random_state=rs_clf)
+            clf.set_params(random_state=random_state_al)
 
         # Fit learner
         if weighted_training:
