@@ -43,11 +43,12 @@ df_tca = df_tca[(df_tca["train_eval_with_projection"] == False) & (df_tca["train
 df_sstca.drop(IGNORE, axis = 1, inplace = True)
 df_tca.drop(IGNORE, axis = 1, inplace = True)
 
-# %% heatmap normal results
+# %% heatmap normal results (this picture is not really insightfull)
 
 df_tca_ = df_tca[df_tca["test_set"] == "Eval"]
 df_tca_ = df_tca_[df_tca_["training_set"] != "L_s"]
 
+# Not selected: TCA variant, num_components, kernel, mu
 # Filla in Random
 df_tca_[RANDOM_VARS + TCA_VARS] = df_tca_[RANDOM_VARS + TCA_VARS].fillna("NONE")
 
@@ -61,9 +62,12 @@ for size, group in df_tca_.groupby(["l_d_size"]):
 
 # %% heatmap winner results
 
+'''The question here is whether L has better results than L_D '''
 for size, group in df_tca_.groupby(["l_d_size"]):
+    
     if size[0] == 0:
         continue
+    
     df__ = pd.pivot_table(group, index = ["source_dataset", "target_dataset", "model_eval"], columns = ["training_set"], values = "mcc")
     df__['L'] = (df__['L'] >= df__['L_d']).astype(int)
     df__['L_d'] = (df__['L'] < df__['L_d']).astype(int)
@@ -71,6 +75,7 @@ for size, group in df_tca_.groupby(["l_d_size"]):
     df__ = pd.pivot_table(df__, index = ["source_dataset", "target_dataset"], columns = ["model_eval"], values = ["L", "L_d"])
     df__.columns = df__.columns.swaplevel(0, 1)
     df__ = df__.sort_index(axis=1)
+    
     plt.figure(figsize = (10,10))
     sns.heatmap(df__, annot=True)
     plt.title(size)
@@ -80,7 +85,7 @@ for size, group in df_tca_.groupby(["l_d_size"]):
 # %% Analyse TCA
 
 df_tca_ = df_tca[df_tca["test_set"] == "Eval"]
-df_tca_ = df_tca_[df_tca_["training_set"] != "L_s"]
+df_tca_ = df_tca_[df_tca_["training_set"] == "L"]
 
 # Filla in Random
 df_tca_[RANDOM_VARS + TCA_VARS] = df_tca_[RANDOM_VARS + TCA_VARS].fillna("NONE")
@@ -99,6 +104,7 @@ for source_target, df_st in df_tca_.groupby(["source_dataset", "target_dataset"]
         axs[i].set_title("Number of labelled target instances: " + str(size[0]) )
         axs[i].set_xlabel("Evaluation model")
         axs[i].set_ylabel("MCC score trained on L and tested on (target) evaluation dataset")
+        axs[i].set_ylim(-1,1)
         i = i + 1
     plt.suptitle("Source dataset: " + str(source_target[0]) + " - Target dataset : " + str(source_target[1]))
     plt.show()  
@@ -106,6 +112,12 @@ for source_target, df_st in df_tca_.groupby(["source_dataset", "target_dataset"]
 #%% Summary Table
 
 # TCA variables 
+df_tca_ = df_tca[df_tca["test_set"] == "Eval"]
+df_tca_ = df_tca_[df_tca_["training_set"] == "L"]
+
+# Filla in Random
+df_tca_[RANDOM_VARS + TCA_VARS] = df_tca_[RANDOM_VARS + TCA_VARS].fillna("NONE")
+
 df_tca_ = df_tca_[df_tca_["num_components"].isin([8.0, "NONE"])]
 df_tca_ = df_tca_[df_tca_["mu"] != 10.0]
 

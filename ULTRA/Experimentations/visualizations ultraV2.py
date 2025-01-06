@@ -2,7 +2,6 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
-
 from project_paths import get_results_df
 
 # %%
@@ -21,7 +20,7 @@ EVAL_COLUMNS = ['tp', 'tn', 'fp', 'fn', 'recall', 'prec',
 
 # %% Download data
 
-df = get_results_df("test ultraV2 target BM ratio 95 V1")
+df = get_results_df("test ultraV2 target BM ratio 95 V2")
 
 IGNORE = ['feature_extractor', 'version', 'protocol', 'uniform_sample_size', 
           'experiment_name']
@@ -49,21 +48,87 @@ df = df.groupby(['source_dataset', 'target_dataset', 'update_projection', 'updat
 # %%
 #df_ = df[df["train_eval_with_weights"] == False]
 df_ = df[df["update_projection"] == True]
-df_ = df_[df_["train_eval_with_weights"] == False]
+#df_ = df_[df_["train_eval_with_weights"] == False]
 
 path = "/home/etienne/Dropbox/Projects/ULTRA/Results/Figures/Experiment ultra V2 bm 95/"
 
-for comb, group in df_.groupby(['source_dataset', 'target_dataset',"model_eval"]):
+for comb, group in df_.groupby(['source_dataset', 'target_dataset', "model_eval"]):
     
+   # if comb[2] != "RF":
+   #     continue
     
-    df_plot = pd.pivot_table(group, index = ["l_d_size"], columns = [ "training_set", "update_weights", "train_eval_with_projection"], values = "mcc")
-
+    df_plot = pd.pivot_table(group, index = ["l_d_size"], columns = ["train_eval_with_weights","update_weights", "train_eval_with_projection"], values = "mcc")
 
     plt.figure(figsize = (9,9))
     
     df_plot.plot(title = "Source " + comb[0] + " - Target " + comb[1]  + " - " + comb[2], figsize = (6,6))
-
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.3),
+          ncol=3, fancybox=True, shadow=True)
     plt.tight_layout()
-    plt.savefig(path + "ultraV2 experiment - " +"-".join(comb) + ".png")
+    plt.xlabel("Number of target instances labelled")
+    plt.ylabel("MCC score on evaluation dataset")
+    plt.savefig(path + comb[2] +"/ultraV2 experiment - " +"-".join(comb) + ".png")
     plt.show()
+    
+# %%
+
+df_ = df[df["update_projection"] == True]
+df_ = df_[df_["train_eval_with_weights"] == False]
+
+path = "/home/etienne/Dropbox/Projects/ULTRA/Results/Figures/Experiment ultra V2 bm 95/"
+
+for comb, group in df_.groupby(['source_dataset', 'target_dataset', "model_eval"]):
+    
+    if comb[2] != "RF":
+        continue
+
+    df_plot = pd.pivot_table(group, index = ["l_d_size"], columns = ["update_weights", "train_eval_with_projection"], values = "mcc")
+
+    plt.figure(figsize = (9,9))
+    
+    df_plot.plot(title = "Source " + comb[0] + " - Target " + comb[1]  + " - " + comb[2], figsize = (6,6))
+    L = plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15),
+          ncol=4, fancybox=True, shadow=True)
+    L.get_texts()[0].set_text('None')    
+    L.get_texts()[1].set_text('TL')
+    L.get_texts()[2].set_text('NTL')    
+    L.get_texts()[3].set_text('TL + NTL')
+    plt.tight_layout()
+    plt.xlabel("Number of target instances labelled")
+    plt.ylabel("MCC score on evaluation dataset")
+    plt.savefig(path + comb[2] +"/ultraV2 experiment - no train_eval_with_weights - " +"-".join(comb) + ".png")
+    plt.show()    
+    
+# %%
+for comb, group in df_.groupby(['source_dataset', 'target_dataset']):
+    
+    group_ = group[group["train_eval_with_weights"] == True]
+    group_ = group_[group_["update_weights"] == True]
+    group_ = group_[group_["train_eval_with_projection"] == True]
+    
+    df_plot = pd.pivot_table(group_, index = ["l_d_size"], columns = ["model_eval"], values = "mcc")
+
+    plt.figure(figsize = (9,9))
+    
+    df_plot.plot(title = "Source " + comb[0] + " - Target " + comb[1], figsize = (6,6))
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2),
+          ncol=3, fancybox=True, shadow=True)
+    plt.tight_layout()
+    plt.xlabel("Number of target instances labelled")
+    plt.ylabel("MCC score on evaluation dataset")
+    plt.savefig(path +"ultraV2 experiment compare models- " +"-".join(comb) + ".png")
+    plt.show()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
