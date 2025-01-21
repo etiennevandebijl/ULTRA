@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from project_paths import get_results_df
 
@@ -21,6 +22,8 @@ df = df.replace({"kernel": dict_})
 # Drop ignorable columns
 df.drop(IGNORE, axis = 1, inplace = True)
 
+df = df[df["l_d_size"] != 20]
+
 # Select only the eval
 df_eval = df[df["test_set"] == "Eval"]
 
@@ -34,7 +37,9 @@ df_eval_ = df_eval.replace({"training_set": dict_})
 plot_source_target(df_eval_[df_eval_["kernel"] == "NONE"], hue = "training_set",
                        hue_title = "Training set",
                        plot_num_obs = False,
-                       extra_info = "no TL")
+                       extra_info = "no TL",
+                       loc_legend = (0.68, 0.92),
+                       figsize = (15,7))
 
 # %%
 
@@ -46,21 +51,84 @@ plot_source_target(df_eval_L, hue = "kernel",
                        hue_title = "TCA kernel",
                        subtitle = "mu = 1, number of components = 8, training set = Source + Target",
                        extra_info = "TL vs original mu 1 numb comp 8 training set L",
+                       loc_legend = (0.68, 0.92),  
                        plot_num_obs = False)
 
 #%%
 
 df_eval_L = df_eval[df_eval["training_set"] == "L"]
 df_eval_L = df_eval_L[df_eval_L["mu"] != 10.0]
-df_eval_L = df_eval_L[df_eval_L["model_eval"] == "RF"]
+df_eval_L = df_eval_L[df_eval_L["num_components"] != "NONE"]
+
+for model_ in ["RF", "NN_BF"]:
+
+    df_eval_L_ = df_eval_L[df_eval_L["model_eval"] == model_]
+    
+    plot_source_target(df_eval_L_, hue = "num_components",
+                           hue_title = "TCA number of components",
+                           x_var = "kernel",
+                           x_label = "Kernel",                       
+                           subtitle = "mu = 1, model = " + model_ + ", training set = Source + Target",
+                           extra_info = "TL mu 1 model " + model_ +" training set L",
+                           loc_legend = (0.68, 0.92), 
+                           figsize = (19,7),
+                           plot_num_obs = False)
+
+
+# %%
+df_eval_L = df_eval[df_eval["training_set"] == "L"]
+df_eval_L = df_eval_L[df_eval_L["mu"] != 10.0]
+df_eval_L = df_eval_L[df_eval_L["kernel"] == "Linear"]
 
 plot_source_target(df_eval_L, hue = "num_components",
-                       hue_title = "TCA number of components",
-                       x_var = "kernel",
-                       x_label = "Kernel",                       
-                       subtitle = "mu = 1, model = RF, training set = Source + Target",
-                       extra_info = "TL vs original mu 1 model RF training set L",
+                       hue_title = "TCA number of components",                      
+                       subtitle = "mu = 1, training set = Source + Target",
+                       extra_info = "TL mu 1 training set L kernel linear",
+                       loc_legend = (0.68, 0.92), 
+                       figsize = (19,7),
                        plot_num_obs = False)
+
+#%%
+df_eval_L = df_eval[df_eval["training_set"] != "L_s"]
+df_eval_L = df_eval_L[df_eval_L["mu"] != 10.0]
+df_eval_L = df_eval_L[df_eval_L["kernel"].isin(["Linear"])]
+
+df_eval_L = df_eval_L.replace({"training_set": dict_})
+    
+for model_ in ["RF", "NN_BF"]:
+
+    df_eval_L_ = df_eval_L[df_eval_L["model_eval"] == model_]
+    
+    plot_source_target(df_eval_L_, hue = "num_components",
+                       hue_title = "TCA number of components",       
+                       x_var = "training_set",
+                       x_label = "Training set",  
+                       subtitle = "mu = 1, model = " + model_ + ", training set = Source + Target",
+                       extra_info = "TL vs original mu 1 model " + model_ +" training set L kernel linear",
+                       loc_legend = (0.68, 0.92), 
+                       figsize = (19,7),
+                       plot_num_obs = False)
+
+#%%
+
+df_eval_L = df_eval[df_eval["training_set"] == "L"]
+df_eval_L = df_eval_L[df_eval_L["mu"] != 10.0]
+df_eval_L = df_eval_L[df_eval_L["kernel"].isin(["Linear"])]
+
+df_eval_L = df_eval_L[df_eval_L["model_eval"] == "NN_BF"]
+
+df_summary = pd.pivot_table(df_eval_L, index = ["source_dataset", "target_dataset"], columns = ["l_d_size", "num_components"], values = "mcc").round(3)
+
+df_summary = df_summary.to_latex(index=False)
+
+#%%
+
+
+
+
+
+
+
 
 # %%
 

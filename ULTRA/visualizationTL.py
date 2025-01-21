@@ -34,7 +34,8 @@ def plot_source_target(data, hue, hue_title, extra_info = "",
                         loc_legend = (0.72, 0.92),  
                         subtitle = "", plot_type = "boxplot", 
                         experiment = "Experiment TCA compare hyperparameters target BM ratio 95 V1/",
-                        plot_num_obs = False
+                        plot_num_obs = False,
+                        figsize = (19,7)
                         ):
     
     save_path = PROJECT_PATH + "Results/Figures/" + experiment
@@ -48,7 +49,7 @@ def plot_source_target(data, hue, hue_title, extra_info = "",
     
     for source_target, df_st in data.groupby(["source_dataset", "target_dataset"]):
     
-        fig, axs = plt.subplots(1, 4, figsize = (19,7))
+        fig, axs = plt.subplots(1, len(df_st["l_d_size"].unique()), figsize = figsize)
         i = 0
     
         for size, group in df_st.groupby(["l_d_size"]):

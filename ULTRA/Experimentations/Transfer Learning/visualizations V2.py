@@ -35,7 +35,7 @@ df_eval_L = df_eval[df_eval["training_set"] == "L"]
 df_eval_L = df_eval_L[df_eval_L["num_components"].isin([8.0, "NONE"])]
 df_eval_L = df_eval_L[df_eval_L["mu"] != 10.0]
 df_eval_L = df_eval_L[df_eval_L["kernel"].isin(["Linear", "NONE"])]
-df_eval_L = df_eval_L[df_eval_L["sigma"].isin(["1","NONE"])]
+df_eval_L = df_eval_L[df_eval_L["sigma"].isin(["1", 1, "NONE"])]
 
 df_eval_L = df_eval_L[df_eval_L["self_dependence"].isin([False,"NONE"])]
 df_eval_L = df_eval_L[df_eval_L["gamma"].isin([0.5,"NONE"])]
@@ -140,16 +140,18 @@ plot_source_target(df_eval_L, hue = "num_neighbours",
 
 df_eval_L = df_eval[df_eval["training_set"] == "L"]
 
+#counter = df_eval_L.groupby(EXP_VARS + TCA_VARS + SSTCA_VARS)[RANDOM_VARS].agg("count")
+
 df_eval_L = df_eval_L[df_eval_L["model_eval"] != "SVM"]
 
 # TCA
-df_eval_L = df_eval_L[df_eval_L["num_components"].isin([8.0, "NONE"])]
-df_eval_L = df_eval_L[df_eval_L["mu"].isin([1,0, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["num_components"].isin([8.0, 8, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["mu"].isin([1.0, "NONE"])]
 df_eval_L = df_eval_L[df_eval_L["kernel"].isin(["Linear", "NONE"])]
 
 # SSTCA
-df_eval_L = df_eval_L[df_eval_L["sigma"].isin(["1", "NONE"])]
-df_eval_L = df_eval_L[df_eval_L["num_neighbours"].isin([200, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["sigma"].isin(["1", 1, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["num_neighbours"].isin([100, "NONE"])]
 df_eval_L = df_eval_L[df_eval_L["lambda"].isin([1, "NONE"])]
 
 df_eval_L = df_eval_L[df_eval_L["self_dependence"].isin([False, "NONE"])]

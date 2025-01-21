@@ -31,7 +31,7 @@ def TCA_grid(X, y, L_s, L_d, U, exp_info,
              target_dependence = None, 
              self_dependence = None):
         
-    for mu, kernel in product([1.0], ["linear", "rbf", "laplacian"]):                
+    for mu, kernel in product([1.0], ["linear"]):  #  ["linear", "rbf", "laplacian"]              
 
         W, eigenvalues, obj = SSTCAplusV3(X, y, L_s, L_d, U,
                                           components = X.shape[0], 
@@ -81,7 +81,7 @@ def fit_predict_simpler(X, y, L_s, L_d, U, dict_info, X_eval, y_eval):
     A = np.eye(X.shape[1])
     p = np.ones(M_total)
     
-    for rs_eval_clf, eval_model in product([0], ["DT", "RF", "NN_BF"]) :
+    for rs_eval_clf, eval_model in product([0, 1, 2, 3, 4, 5], ["DT", "RF", "NN_BF"]) :
          
         ml_info = {"random_state_eval": rs_eval_clf}
         
@@ -100,7 +100,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
     X_s, y_s_mc, _, _ = dataloader(source_dataset, feature_extractor, version, protocol, False, True)    
     X_d, y_d_mc, _, _ = dataloader(target_dataset, feature_extractor, version, protocol, False, True)    
     
-    for subset_rs in range(4):
+    for subset_rs in [4]:
         
         X_source, y_source = get_balanced_subset(X_s, y_s_mc, size, subset_rs, make_binary = True)
         X_eval, y_eval = get_balanced_subset(X_d, y_d_mc, size, subset_rs+10, make_binary = True)
@@ -170,7 +170,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
             # SSTCA
             
             for k, sigma, lamda, gamma, target_dep, self_dep in tqdm.tqdm(product([50, 100, 200], # Study 
-                                                                       [1, "MED", "MEAN"], # Sigma
+                                                                       [1], # Sigma
                                                                        [1, 100, 1000], # Lambda (Study)
                                                                        [0.5],
                                                                        [False, True],
