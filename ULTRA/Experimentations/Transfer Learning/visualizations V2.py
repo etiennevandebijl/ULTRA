@@ -20,6 +20,11 @@ df.drop(IGNORE, axis = 1, inplace = True)
 dict_ = {"linear" : 'Linear', "rbf" : 'RBF', "laplacian": 'Laplacian'}
 df = df.replace({"kernel": dict_})
 
+dict_2 = {1: "1"}
+df = df.replace({"sigma": dict_2})
+
+df = df[df["l_d_size"] != 20]
+
 # Select only the eval
 df_eval = df[df["test_set"] == "Eval"]
 
@@ -156,16 +161,12 @@ df_eval_L = df_eval_L[df_eval_L["lambda"].isin([1, "NONE"])]
 
 df_eval_L = df_eval_L[df_eval_L["self_dependence"].isin([False, "NONE"])]
 
-# Ff checken want het aantal is wel erg laag
-#df_eval_L = df_eval_L[df_eval_L["random_state_eval"] == 0]
-#df_eval_L = df_eval_L[df_eval_L["random_state_subset"] < 4]
-
 plot_source_target(df_eval_L, hue = "tca_variant",
                         hue_title = "TCA variant",  
                         subtitle = "mu = 1, SSTCA number of components = 8, kernel = linear, training set = Source + Target, sigma = 1, num neigh = 100, lambda = 1",
                         extra_info = "SSTCA TCA NONE mu 1 num comb 8 kernel linear sigma 1 num neighbours 100 lambda 1 training set L",
                         experiment = "Experiment SSTCA compare hyperparameters target BM ratio 95 V1/",
-                          plot_num_obs = True
+                         # plot_num_obs = True
                         )
 
 for model in ["RF", "DT", "NN_BF"]:
@@ -176,9 +177,51 @@ for model in ["RF", "DT", "NN_BF"]:
                            subtitle = "mu = 1, SSTCA number of components = 8, kernel = linear, training set = Source + Target, sigma = 1, num neigh = 100, lambda = 1 model = " + model,
                            extra_info = "SSTCA TCA NONE mu 1 num comb 8 kernel linear sigma 1 num neighbours 100 lambda 1 training set L model " + model,
                            experiment = "Experiment SSTCA compare hyperparameters target BM ratio 95 V1/",
-                           plot_num_obs = True
+                           #plot_num_obs = True
                            )
 
+
+# %% Summary Table TCA variants
+
+df_eval_L = df_eval[df_eval["training_set"] == "L"]
+
+df_eval_L = df_eval_L[df_eval_L["model_eval"] != "SVM"]
+
+# TCA
+df_eval_L = df_eval_L[df_eval_L["num_components"].isin([8.0, 8, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["mu"].isin([1.0, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["kernel"].isin(["Linear", "NONE"])]
+
+# SSTCA
+df_eval_L = df_eval_L[df_eval_L["sigma"].isin(["1", 1, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["num_neighbours"].isin([100, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["lambda"].isin([1, "NONE"])]
+
+df_eval_L = df_eval_L[df_eval_L["self_dependence"].isin([False, "NONE"])]
+
+df_eval_L = df_eval_L[df_eval_L["model_eval"] == "NN_BF"]
+
+df_summary = pd.pivot_table(df_eval_L, index = ["source_dataset", "target_dataset"], columns = ["l_d_size", "tca_variant"], values = "mcc").round(3)
+
+# %% Summary Table number of components
+
+
+df_eval_L = df_eval[df_eval["training_set"] == "L"]
+
+# TCA
+df_eval_L = df_eval_L[df_eval_L["num_components"].isin([8.0, 8, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["mu"].isin([1.0, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["kernel"].isin(["Linear", "NONE"])]
+
+# SSTCA
+df_eval_L = df_eval_L[df_eval_L["sigma"].isin(["1", 1, "NONE"])]
+df_eval_L = df_eval_L[df_eval_L["num_neighbours"].isin([100, "NONE"])]
+
+df_eval_L = df_eval_L[df_eval_L["self_dependence"].isin([False, "NONE"])]
+
+df_eval_L = df_eval_L[df_eval_L["model_eval"] == "NN_BF"]
+
+df_summary = pd.pivot_table(df_eval_L, index = ["source_dataset", "target_dataset"], columns = ["l_d_size", "lambda"], values = "mcc").round(3)
 
 # %%Compare results
 

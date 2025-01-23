@@ -37,7 +37,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                     "protocol": protocol,
                     "uniform_sample_size": size,
                     "random_state_subset": subset_rs,
-                    "experiment_name": "test ultraV2 target BM ratio 95 V2 redo eval_rs"
+                    "experiment_name": "test ultraV2 target BM ratio 95 V3"
                     }
         
         for model_tl, model_eval,  \
@@ -56,7 +56,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                        
                         #EVAL
                         model_eval = model_eval,
-                        random_state_eval = 0,
+                        random_state_eval = random_state_eval,
                         
                         #TL
                         model_tl = model_tl,

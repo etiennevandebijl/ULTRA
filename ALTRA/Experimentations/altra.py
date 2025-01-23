@@ -24,7 +24,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
     X_s, y_s_mc, _, _ = dataloader(source_dataset, feature_extractor, version, protocol, False, True)    
     X_d, y_d_mc, _, _ = dataloader(target_dataset, feature_extractor, version, protocol, False, True)    
     
-    for subset_rs in [0]:
+    for subset_rs in range(10):
         
         X_source, y_source = get_balanced_subset(X_s, y_s_mc, size, subset_rs, make_binary = True)
         X_eval, y_eval = get_balanced_subset(X_d, y_d_mc, size, subset_rs + 10, make_binary = True)
@@ -45,7 +45,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                     }
         
         for model_eval, random_state_tl, random_state_al, random_state_eval, strategy \
-                in product(MODELS, [0], [0], [0], ["Random", "Uncertainty", "Certainty"]):
+                in product(MODELS, [0], [0], list(range(5)), ["Random", "Uncertainty", "Certainty"]):
         
             for normalize_v, prob_predict_tl in product([False, True], [False]):
                 
