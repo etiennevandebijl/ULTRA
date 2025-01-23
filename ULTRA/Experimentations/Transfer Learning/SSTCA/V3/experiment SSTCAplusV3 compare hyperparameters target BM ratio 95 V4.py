@@ -139,7 +139,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                         "l_s_size": len(L_s),
                         "l_d_size": len(L_d),
                         "u_size": len(U),
-                        "experiment_name": "test SSTCA-V3 target BM ratio 95 V4"
+                        "experiment_name": "test SSTCA V3 target BM ratio 95 V4"
                         }
             
             TCA_info = {"tca_variant":None,

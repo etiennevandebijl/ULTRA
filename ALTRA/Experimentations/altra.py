@@ -9,6 +9,7 @@ from ALTRA.burakfilter import burakfilter
 import warnings
 warnings.filterwarnings("ignore")
 
+# %%
 feature_extractor = "NetFlow V1"; version = "1_Raw"; protocol = "NF"; size = 10000
 
 datasets = ["UNSW-NB15", "BoT-IoT","CIC-IDS-2018", "ToN-IoT"]
@@ -41,7 +42,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                     "protocol": protocol,
                     "uniform_sample_size": size,
                     "random_state_subset": subset_rs,
-                    "experiment_name": "test altra target BM ratio 95"
+                    "experiment_name": "test ALTRA target BM ratio 95"
                     }
         
         for model_eval, random_state_tl, random_state_al, random_state_eval, strategy \

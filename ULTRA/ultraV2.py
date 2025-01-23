@@ -5,7 +5,7 @@ from ULTRA.projectionV2 import optimize_projection_matrix, determine_loss_and_ep
 
 from ULTRA.weightupdate import normalize_weights, weightupdate
 from ULTRA.fitpredictV2 import fit_predict
-from ULTRA.Visualizations.plotweightupdate import plot_weight_update
+from ULTRA.plotweightupdate import plot_weight_update
 
 
 def ultraV2(X_source, y_source, X_target, 

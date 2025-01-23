@@ -1,22 +1,17 @@
 import pandas as pd
-
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 from project_paths import get_results_df
 
-import seaborn as sns
 
 # %% Download data
 
-df = get_results_df("test altra target BM ratio 95")
+df = get_results_df("test ALTRA target BM ratio 95")
 
 # Select only the eval
 df_eval = df[df["test_set"] == "Eval"]
 
-''' 
-Choices:   
-
-'''
 
 df_eval = df_eval[df_eval["train_eval_with_weights"] == True]
 
@@ -36,7 +31,7 @@ df_eval__ = pd.pivot_table(data = df_eval_, values = "mcc", index = cols, column
 #%%
                 
                        
-for comb, group in df_eval__.groupby(['source_dataset', 'target_dataset']):
+for comb, group in df_eval__.groupby(['source_dataset', 'target_dataset', 'al_strategy', 'normalize_v']):
                                                  
     plt.figure(figsize = (10,10))
 
