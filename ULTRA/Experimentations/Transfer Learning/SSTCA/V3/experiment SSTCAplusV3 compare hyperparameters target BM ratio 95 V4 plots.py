@@ -152,7 +152,7 @@ df_eval_L_ = df_eval_L_[df_eval_L_["num_neighbours"].isin([100, "NONE"])]
 df_eval_L_ = df_eval_L_[df_eval_L_["lambda"].isin([1, "NONE"])]
 
 plot_source_target(df_eval_L_, hue = "tca_variant",
-                        hue_title = "TCA variant",  
+                        hue_title = "TCA variant",
                         subtitle = "mu = 1, SSTCA number of components = 8, kernel = linear, training set = Source + Target, sigma = 1, num neigh = 100, lambda = 1",
                         extra_info = "SSTCA TCA NONE mu 1 num comb 8 kernel linear sigma 1 num neighbours 100 lambda 1 training set L",
                         experiment = "Experiment SSTCA compare hyperparameters target BM ratio 95 V1/",

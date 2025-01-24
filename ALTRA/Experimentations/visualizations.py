@@ -12,7 +12,6 @@ df = get_results_df("test ALTRA target BM ratio 95")
 # Select only the eval
 df_eval = df[df["test_set"] == "Eval"]
 
-
 df_eval = df_eval[df_eval["train_eval_with_weights"] == True]
 
 df_eval = df_eval[df_eval["training_set"] != "L_s"]
