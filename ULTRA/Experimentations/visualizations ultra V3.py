@@ -17,7 +17,10 @@ df_eval = df_eval[df_eval["train_eval_with_weights"] == False]
 cols = ['source_dataset', 'target_dataset', 'model_eval', "l_d_size", 'update_projection', 
         'update_weights', 'training_set', 'train_eval_with_projection']
 
-df_eval = df_eval.groupby(cols)["mcc"].apply(lambda x: pd.Series({'mean': x.mean(),
+metric = "mcc"
+if metric == "mcc":
+    ddb = 0
+df_eval = df_eval.groupby(cols)[metric].apply(lambda x: pd.Series({'mean': x.mean(),
                                                                    'LB': x.mean() - x.std(),
                                                                    'UB': x.mean() + x.std(),
                                                                    "count": x.count()})).reset_index()
@@ -38,7 +41,7 @@ df_eval.loc[source_target, "label"] = "Source + Target"
 
 source_target_SSTCA = (df_eval["update_projection"] == True) & (df_eval["training_set"] == "L") \
             & (df_eval["update_weights"] == False) & (df_eval["train_eval_with_projection"] == True) 
-df_eval.loc[source_target_SSTCA, "label"] = "SSTCA Source + Target"
+df_eval.loc[source_target_SSTCA, "label"] = "SSTCA$^+$ Source + Target"
 
 source_target_ULTRA = (df_eval["update_projection"] == True) & (df_eval["training_set"] == "L") \
             & (df_eval["update_weights"] == True) & (df_eval["train_eval_with_projection"] == True) 
@@ -46,7 +49,7 @@ df_eval.loc[source_target_ULTRA, "label"] = "ULTRA Source + Target"
 
 colour_dict = {"Target":"blue",
                "Source + Target": "orange",
-               "SSTCA Source + Target": "red",
+               "SSTCA$^+$ Source + Target": "red",
                "ULTRA Source + Target": "green"}
 
 df_eval = df_eval[df_eval["label"] != "NONE"]
@@ -66,13 +69,16 @@ for comb, df_eval_st in df_eval.groupby(['source_dataset', 'target_dataset', "mo
         plt.fill_between(df_eval_st_lab["l_d_size"].values, df_eval_st_lab["LB"].values,
                          df_eval_st_lab["UB"].values, color=colour_dict[label[0]], alpha=0.2)
 
-    plt.title("Source " + comb[0] + " - Target " + comb[1]  + " - " + comb[2])
+    plt.title("Source " + comb[0] + " - Target " + comb[1] )
     
     plt.legend()
 
     plt.xlabel("Number of target instances labeled")
     plt.ylabel("MCC score on evaluation dataset")
 
+    plt.axhline(y = ddb, color = "black")
+    plt.text(80, -0.04, "DD baseline")
+    
     plt.tight_layout()
     plt.savefig(path + comb[2] +"/ultraV3 experiment confidence bounds - " +"-".join(comb) + ".png")
         
@@ -100,6 +106,9 @@ for comb, group in df_eval_ULTRA.groupby(['source_dataset', 'target_dataset']):
     plt.xlabel("Number of target instances labeled")
     plt.ylabel("MCC score on evaluation dataset")
 
+    plt.axhline(y = ddb, color = "black")
+    plt.text(80, -0.04, "DD baseline")
+    
     plt.tight_layout()
     plt.savefig(path + "/ultraV3 experiment confidence bounds - compare models - " +"-".join(comb) + ".png")
         

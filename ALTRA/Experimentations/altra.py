@@ -42,7 +42,7 @@ for source_dataset, target_dataset in product(datasets, datasets):
                     "protocol": protocol,
                     "uniform_sample_size": size,
                     "random_state_subset": subset_rs,
-                    "experiment_name": "test ALTRA target BM ratio 95"
+                    "experiment_name": "test ALTRA target BM ratio 95 V2"
                     }
         
         for model_eval, random_state_tl, random_state_al, random_state_eval, strategy \

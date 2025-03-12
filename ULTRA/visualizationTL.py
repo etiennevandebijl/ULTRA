@@ -35,7 +35,8 @@ def plot_source_target(data, hue, hue_title, extra_info = "",
                         subtitle = "", plot_type = "boxplot", 
                         experiment = "Experiment TCA compare hyperparameters target BM ratio 95 V1/",
                         plot_num_obs = False,
-                        figsize = (19,7)
+                        figsize = (19,7),
+                        ddb = 0.0
                         ):
     
     save_path = PROJECT_PATH + "Results/Figures/" + experiment
@@ -83,7 +84,10 @@ def plot_source_target(data, hue, hue_title, extra_info = "",
 
             if plot_type == "scatterplot":
                 sns.scatterplot(data = group, x = x_var, y = y_var, hue = hue, ax=axs[i], palette='tab10')
-            
+                axs[i].axhline(y = ddb, color = "black")
+                middle = group[x_var].min() + (group[x_var].max() - group[x_var].min()) * 0.80
+                axs[i].text(middle, -0.04, "DD baseline")
+                
             axs[i].set_title("Number of labeled target instances: " + str(size[0]))
             
             axs[i].set_xlabel(x_label)

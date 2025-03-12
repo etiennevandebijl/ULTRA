@@ -6,7 +6,7 @@ from project_paths import get_results_df
 
 # %% Download ALTRA
 
-df_altra = get_results_df("test ALTRA target BM ratio 95")
+df_altra = get_results_df("test ALTRA target BM ratio 95 V2")
 df_ultra = get_results_df("test ULTRA V2 target BM ratio 95 V3")
 
 df = pd.concat([df_altra, df_ultra], ignore_index=True, sort=False)
@@ -14,7 +14,7 @@ df = pd.concat([df_altra, df_ultra], ignore_index=True, sort=False)
 '''
 feature_extractor = NetFlow V1, version = 1_Raw, protocol = NF,
 uniform_sample_size = 10000, query_size = 5, al_num_iterations = 21,
-weight_update_iterations = 5, adjust_v = True, num_iterations = 20 (FML),
+weight_update_iterations = 5, adjust_v = True, num_iterations = 21,
 uniform_tl_sample_size = 1000, train_tl_with_weights = False, model_tl = "RF" (ULTRA),
 model_al = DT (this is SVM for ALTRA, and random for ULTRA), v_update = True
 train_al_with_weights = False (ULTRA)
@@ -42,7 +42,11 @@ cols = ['source_dataset', 'target_dataset', 'experiment_name', 'al_strategy',
         'normalize_v', 'train_eval_with_weights', 
         'train_eval_with_projection', 'update_projection', 'update_weights']
 
-df_eval_ = df_eval.groupby(cols)["mcc"].apply(lambda x: pd.Series({'mean': x.mean(),
+metric = "mcc"
+if metric == "mcc":
+    ddb = 0
+    
+df_eval_ = df_eval.groupby(cols)[metric].apply(lambda x: pd.Series({'mean': x.mean(),
                                                                    'LB': x.mean() - x.std(),
                                                                    'UB': x.mean() + x.std(),
                                                                    "count": x.count()})).reset_index()
@@ -57,7 +61,7 @@ source_target_ULTRA = (df_eval__["update_projection"] == True) & (df_eval__["tra
                 & (df_eval__["train_eval_with_weights"] == False)
 
 source_target_ALTRA = (df_eval__["training_set"] == "L") & (df_eval__["normalize_v"] == False)\
-                    & (df_eval__["train_eval_with_weights"] == True) & (df_eval__["al_strategy"] == "Uncertainty")
+                    & (df_eval__["train_eval_with_weights"] == False) & (df_eval__["al_strategy"] == "Uncertainty")
 
 
 df_eval_ULTRA_ALTRA = df_eval__[source_target_ULTRA + source_target_ALTRA]
@@ -81,11 +85,14 @@ for comb, group in df_eval_ULTRA_ALTRA.groupby(['source_dataset', 'target_datase
         plt.fill_between(subgroup_["l_d_size"].values, subgroup_["LB"].values,
                          subgroup_["UB"].values, alpha=0.2)
 
-    plt.title("Source " + comb[0] + " - Target " + comb[1] + " - Model " + comb[2])
+    plt.title("Source " + comb[0] + " - Target " + comb[1] )
     
+    plt.axhline(y = ddb, color = "black")
+    plt.text(85, -0.04, "DD baseline")
+                
     plt.legend()
 
-    plt.xlabel("Number of target instances labelled")
+    plt.xlabel("Number of target instances labeled")
     plt.ylabel("MCC score on evaluation dataset")
 
     plt.tight_layout()
@@ -93,10 +100,13 @@ for comb, group in df_eval_ULTRA_ALTRA.groupby(['source_dataset', 'target_datase
     plt.show()
 
 
+#%%
+
+df_eval_ULTRA_ALTRA_ = df_eval_ULTRA_ALTRA[df_eval_ULTRA_ALTRA["model_eval"] == "RF"]
+df_eval_ULTRA_ALTRA_ = df_eval_ULTRA_ALTRA_[df_eval_ULTRA_ALTRA_["l_d_size"] == 100]
 
 
-
-
+df_summary_1 = pd.pivot_table(df_eval_ULTRA_ALTRA_, index = ["source_dataset", "target_dataset"], columns = ["experiment_name"], values = "mean").round(3)
 
 
 

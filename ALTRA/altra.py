@@ -49,7 +49,7 @@ def altra(X_source, y_source, X_target, y_target, X_target_test, y_target_test, 
 
     v = np.ones(len(T_T))
     
-    for t in range(al_num_of_iterations):
+    for t in range(al_num_of_iterations + 1):
 
         # Gather statistics
         counters = {"l_s_size": len(T_),
