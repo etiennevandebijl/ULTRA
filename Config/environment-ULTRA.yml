@@ -24,8 +24,8 @@ dependencies:
   - brotli-bin=1.0.9=h5eee18b_8
   - brotli-python=1.0.9=py312h6a678d5_8
   - bzip2=1.0.8=h5eee18b_6
-  - ca-certificates=2024.8.30=hbcca054_0
-  - certifi=2024.8.30=pyhd8ed1ab_0
+  - ca-certificates=2024.12.31=h06a4308_0
+  - certifi=2025.1.31=py312h06a4308_0
   - cffi=1.16.0=py312h5eee18b_1
   - chardet=4.0.0=py312h06a4308_1003
   - charset-normalizer=3.3.2=pyhd3eb1b0_0
@@ -137,6 +137,7 @@ dependencies:
   - nbformat=5.9.2=py312h06a4308_0
   - ncurses=6.4=h6a678d5_0
   - nest-asyncio=1.6.0=py312h06a4308_0
+  - networkx=3.4.2=py312h06a4308_0
   - nspr=4.35=h6a678d5_0
   - nss=3.89.1=h6a678d5_0
   - numexpr=2.8.7=py312hf827012_0
